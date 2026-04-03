@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { PhoneVerification } from "./phone-verification";
-import type { SignUpResource } from "@clerk/types";
+import type { SignUpResource } from "@clerk/nextjs/dist/types/utils";
 
 export function SignupStep({
   signUp,

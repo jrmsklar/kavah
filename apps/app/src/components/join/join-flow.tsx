@@ -47,30 +47,18 @@ export function JoinFlow() {
   }, [isExistingUser, user]);
 
   function handleSignUpComplete(sessionId: string, userId: string) {
-    console.log("handleSignUpComplete called:", { sessionId, userId });
     clerkSessionIdRef.current = sessionId;
     clerkUserIdRef.current = userId;
   }
 
   async function handleComplete() {
-    // Determine the Clerk user ID from whichever source is available
     let clerkUserId: string | null = null;
 
     if (isExistingUser && user) {
-      // User was already signed in before the join flow
       clerkUserId = user.id;
     } else {
-      // New user — use IDs captured during phone verification
       clerkUserId = clerkUserIdRef.current ?? signUp?.createdUserId ?? null;
     }
-
-    console.log("handleComplete:", {
-      isExistingUser,
-      clerkUserId,
-      refUserId: clerkUserIdRef.current,
-      refSessionId: clerkSessionIdRef.current,
-      signUpUserId: signUp?.createdUserId,
-    });
 
     if (!clerkUserId) {
       throw new Error("Sign-up did not complete. Please start over.");
