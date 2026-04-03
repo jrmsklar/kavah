@@ -4,7 +4,7 @@ import { Toast, Toaster, createToaster } from "@ark-ui/react/toast";
 import { Portal } from "@ark-ui/react/portal";
 import { X, Loader2, Check } from "lucide-react";
 
-export const toaster = createToaster({
+export const toaster: ReturnType<typeof createToaster> = createToaster({
   overlap: true,
   placement: "bottom-end",
   gap: 16,
