@@ -17,6 +17,8 @@ import {
 } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toaster } from "@/components/ui/toast";
 import type {
   PromptSection,
   Prompt,
@@ -34,11 +36,11 @@ export function PromptBuilder({
   communityId: string;
   slug: string;
 }) {
+  const router = useRouter();
   const [sections, setSections] = useState<PromptSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const [saveError, setSaveError] = useState("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -207,7 +209,6 @@ export function PromptBuilder({
   // Save
   async function handleSave() {
     setSaving(true);
-    setSaveError("");
 
     // Recompute sort_order from array indices
     const payload = sections.map((s, si) => ({
@@ -220,6 +221,13 @@ export function PromptBuilder({
       })),
     }));
 
+    const toastId = toaster.create({
+      title: "Saving prompts...",
+      description: "Your prompt configuration is being saved.",
+      type: "loading",
+      duration: Infinity,
+    });
+
     try {
       const res = await fetch(`/api/communities/${communityId}/prompts`, {
         method: "PUT",
@@ -231,11 +239,23 @@ export function PromptBuilder({
         throw new Error("Failed to save");
       }
 
-      const data = await res.json();
-      setSections(data.sections ?? []);
+      toaster.update(toastId, {
+        title: "Prompts saved!",
+        description: "Your prompt configuration has been saved successfully.",
+        type: "success",
+        duration: 3000,
+      });
+
       setDirty(false);
+
+      router.push(`/communities/${slug}`);
     } catch {
-      setSaveError("Failed to save. Please try again.");
+      toaster.update(toastId, {
+        title: "Save failed",
+        description: "Failed to save prompts. Please try again.",
+        type: "error",
+        duration: 5000,
+      });
     } finally {
       setSaving(false);
     }
@@ -274,10 +294,6 @@ export function PromptBuilder({
           {saving ? "Saving..." : "Save"}
         </button>
       </div>
-
-      {saveError && (
-        <p className="mb-4 text-sm text-red-600">{saveError}</p>
-      )}
 
       {/* DnD context */}
       <DndContext
