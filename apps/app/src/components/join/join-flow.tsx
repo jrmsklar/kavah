@@ -117,7 +117,7 @@ export function JoinFlow() {
     } else if (hasBasics) {
       setStep("basics");
     } else {
-      setStep("signup");
+      setStep("welcome");
     }
   }
 
