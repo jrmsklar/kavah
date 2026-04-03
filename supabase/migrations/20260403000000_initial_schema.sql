@@ -1,13 +1,12 @@
 -- Kavah initial schema
 
--- Enable UUID generation
-create extension if not exists "uuid-ossp";
+-- Uses gen_random_uuid() which is built into Postgres 13+
 
 -- ============================================
 -- Users (synced from Clerk)
 -- ============================================
 create table users (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   clerk_id text unique not null,
   phone text unique not null,
   first_name text not null,
@@ -22,7 +21,7 @@ create table users (
 -- Communities
 -- ============================================
 create table communities (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   name text not null,
   slug text unique not null,
   description text,
@@ -35,7 +34,7 @@ create table communities (
 -- Memberships
 -- ============================================
 create table memberships (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   user_id uuid not null references users(id) on delete cascade,
   community_id uuid not null references communities(id) on delete cascade,
   role text not null check (role in ('owner', 'member')),
@@ -48,7 +47,7 @@ create table memberships (
 -- Prompt Sections
 -- ============================================
 create table prompt_sections (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   community_id uuid not null references communities(id) on delete cascade,
   title text not null,
   step text not null check (step in ('basics', 'videos', 'profile')),
@@ -61,7 +60,7 @@ create table prompt_sections (
 -- Prompts
 -- ============================================
 create table prompts (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   section_id uuid not null references prompt_sections(id) on delete cascade,
   label text not null,
   type text not null check (type in ('text_input', 'single_select', 'multi_select', 'video', 'textarea')),
@@ -75,7 +74,7 @@ create table prompts (
 -- Prompt Options
 -- ============================================
 create table prompt_options (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   prompt_id uuid not null references prompts(id) on delete cascade,
   label text not null,
   sort_order int not null default 0,
@@ -87,7 +86,7 @@ create table prompt_options (
 -- Responses
 -- ============================================
 create table responses (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   prompt_id uuid not null references prompts(id) on delete cascade,
   user_id uuid not null references users(id) on delete cascade,
   content text not null,
@@ -100,7 +99,7 @@ create table responses (
 -- Tags
 -- ============================================
 create table tags (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   response_id uuid not null references responses(id) on delete cascade,
   label text not null,
   created_at timestamptz not null default now(),
@@ -111,7 +110,7 @@ create table tags (
 -- Matches
 -- ============================================
 create table matches (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   community_id uuid not null references communities(id) on delete cascade,
   member1_id uuid not null references users(id) on delete cascade,
   member2_id uuid not null references users(id) on delete cascade,
