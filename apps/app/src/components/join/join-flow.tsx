@@ -222,11 +222,21 @@ export function JoinFlow() {
 
   // STEP: Video (one prompt at a time)
   if (step === "video" && videoPrompts.length > 0) {
+    const currentVideoPrompt = videoPrompts[videoPromptIndex];
+    const resolvedClerkUserId =
+      isExistingUser && user
+        ? user.id
+        : clerkUserIdRef.current ?? signUp?.createdUserId ?? null;
+
     return (
       <VideoStep
-        prompt={videoPrompts[videoPromptIndex]}
+        prompt={currentVideoPrompt}
         currentIndex={videoPromptIndex}
         totalCount={videoPrompts.length}
+        communityId={community.id}
+        clerkUserId={resolvedClerkUserId}
+        existingResponse={responses[currentVideoPrompt.id] ?? null}
+        onRecorded={handleUpdateResponse}
         onNext={handleVideoNext}
         onBack={handleVideoBack}
       />
