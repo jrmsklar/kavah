@@ -10,20 +10,21 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6",
+    "@kavah/auth": "workspace:*",
     "@kavah/db": "workspace:*",
     "@kavah/ui": "workspace:*",
-    "@kavah/auth": "workspace:*",
     "next": "^15",
     "react": "^19",
-    "react-dom": "^19"
+    "react-dom": "^19",
+    "svix": "^1.90.0"
   },
   "devDependencies": {
     "@kavah/config": "workspace:*",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
-    "@tailwindcss/postcss": "^4",
     "typescript": "^5"
   }
 }
