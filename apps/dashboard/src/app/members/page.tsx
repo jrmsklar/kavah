@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Community = { id: string; name: string; slug: string };
 type Member = {
@@ -16,6 +17,7 @@ type SortDir = "asc" | "desc";
 export default function MembersPage() {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [selectedCommunityId, setSelectedCommunityId] = useState<string>("");
+  const router = useRouter();
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -176,7 +178,8 @@ export default function MembersPage() {
               {filtered.map((member) => (
                 <tr
                   key={member.id}
-                  className="hover:bg-gray-50 transition"
+                  onClick={() => router.push(`/members/${member.id}?community_id=${selectedCommunityId}`)}
+                  className="hover:bg-gray-50 transition cursor-pointer"
                 >
                   <td className="px-4 py-3 text-gray-900">
                     {member.first_name}

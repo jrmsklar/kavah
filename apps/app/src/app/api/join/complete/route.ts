@@ -2,7 +2,7 @@ import { createServiceClient } from "@kavah/db";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const { communityId, firstName, lastName, phone, clerkUserId } =
+  const { communityId, firstName, lastName, phone, clerkUserId, responses } =
     await req.json();
 
   if (!communityId || !firstName || !lastName || !phone || !clerkUserId) {
@@ -74,6 +74,32 @@ export async function POST(req: Request) {
         { error: "Failed to join community" },
         { status: 500 }
       );
+    }
+  }
+
+  // Save responses if provided
+  if (responses && typeof responses === "object") {
+    const responseEntries = Object.entries(responses as Record<string, string>);
+
+    if (responseEntries.length > 0) {
+      const responseRows = responseEntries
+        .filter(([, value]) => value && value.trim().length > 0)
+        .map(([promptId, content]) => ({
+          prompt_id: promptId,
+          user_id: user.id,
+          content,
+        }));
+
+      if (responseRows.length > 0) {
+        const { error: responsesError } = await supabase
+          .from("responses")
+          .upsert(responseRows, { onConflict: "prompt_id,user_id" });
+
+        if (responsesError) {
+          console.error("Failed to save responses:", responsesError);
+          // Don't fail the whole request — membership was created
+        }
+      }
     }
   }
 

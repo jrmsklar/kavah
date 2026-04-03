@@ -8,7 +8,6 @@ export function WelcomeStep({ onNext }: { onNext: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
       <div className="max-w-md w-full text-center">
-        {/* Community icon */}
         {community.icon_url ? (
           <img
             src={community.icon_url}
