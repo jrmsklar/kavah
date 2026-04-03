@@ -38,12 +38,14 @@ export async function POST(req: Request) {
   const supabase = createServiceClient();
 
   if (evt.type === "user.created" || evt.type === "user.updated") {
-    const { id, phone_numbers, first_name, last_name, birthday, image_url } =
+    const { id, phone_numbers, first_name, last_name, image_url, unsafe_metadata } =
       evt.data;
 
     const primaryPhone = phone_numbers?.find(
       (p) => p.id === evt.data.primary_phone_number_id
     );
+
+    const birthday = (unsafe_metadata as Record<string, unknown>)?.birthday as string | null ?? null;
 
     const { error } = await supabase.from("users").upsert(
       {
@@ -51,7 +53,7 @@ export async function POST(req: Request) {
         phone: primaryPhone?.phone_number ?? "",
         first_name: first_name ?? "",
         last_name: last_name ?? "",
-        birthday: birthday ?? null,
+        birthday,
         avatar_url: image_url ?? null,
       },
       { onConflict: "clerk_id" }

@@ -7,6 +7,11 @@
     },
     "build": {
       "dependsOn": ["^build"],
+      "env": [
+        "CLERK_SECRET_KEY",
+        "CLERK_WEBHOOK_SECRET",
+        "SUPABASE_SERVICE_ROLE_KEY"
+      ],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {
