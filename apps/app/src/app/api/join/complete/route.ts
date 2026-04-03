@@ -1,0 +1,81 @@
+import { createServiceClient } from "@kavah/db";
+import { NextResponse } from "next/server";
+
+export async function POST(req: Request) {
+  const { communityId, firstName, lastName, phone, clerkUserId } =
+    await req.json();
+
+  if (!communityId || !firstName || !lastName || !phone || !clerkUserId) {
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 }
+    );
+  }
+
+  const supabase = createServiceClient();
+
+  // Verify community exists
+  const { data: community } = await supabase
+    .from("communities")
+    .select("id")
+    .eq("id", communityId)
+    .single();
+
+  if (!community) {
+    return NextResponse.json(
+      { error: "Community not found" },
+      { status: 404 }
+    );
+  }
+
+  // Upsert user (handles race with Clerk webhook)
+  const { data: user, error: userError } = await supabase
+    .from("users")
+    .upsert(
+      {
+        clerk_id: clerkUserId,
+        phone,
+        first_name: firstName,
+        last_name: lastName,
+      },
+      { onConflict: "clerk_id" }
+    )
+    .select("id")
+    .single();
+
+  if (userError || !user) {
+    console.error("Failed to upsert user:", userError);
+    return NextResponse.json(
+      { error: "Failed to create user" },
+      { status: 500 }
+    );
+  }
+
+  // Check if membership already exists
+  const { data: existing } = await supabase
+    .from("memberships")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("community_id", communityId)
+    .single();
+
+  if (!existing) {
+    const { error: membershipError } = await supabase
+      .from("memberships")
+      .insert({
+        user_id: user.id,
+        community_id: communityId,
+        role: "member",
+      });
+
+    if (membershipError) {
+      console.error("Failed to create membership:", membershipError);
+      return NextResponse.json(
+        { error: "Failed to join community" },
+        { status: 500 }
+      );
+    }
+  }
+
+  return NextResponse.json({ success: true }, { status: 201 });
+}
