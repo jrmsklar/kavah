@@ -13,6 +13,7 @@
     "@kavah/auth": "workspace:*",
     "@kavah/db": "workspace:*",
     "@kavah/ui": "workspace:*",
+    "lucide-react": "^1.7.0",
     "next": "^15",
     "react": "^19",
     "react-dom": "^19",
