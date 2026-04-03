@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useSignUp } from "@clerk/nextjs";
 import { PhoneVerification } from "./phone-verification";
-import type { SignUpResource } from "@clerk/nextjs/dist/types/utils";
+
+type SignUpResource = NonNullable<ReturnType<typeof useSignUp>["signUp"]>;
 
 export function SignupStep({
   signUp,
