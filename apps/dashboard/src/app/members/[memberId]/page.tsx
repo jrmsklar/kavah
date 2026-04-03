@@ -197,6 +197,15 @@ export default function MemberDetailPage() {
                               </span>
                             ))}
                           </div>
+                        ) : prompt.type === "video" ||
+                          (typeof prompt.response === "string" &&
+                            prompt.response.includes("video-responses")) ? (
+                          <video
+                            src={prompt.response}
+                            controls
+                            playsInline
+                            className="mt-2 w-full max-w-lg rounded-lg"
+                          />
                         ) : (
                           <p className="text-sm text-gray-900">
                             {prompt.response}

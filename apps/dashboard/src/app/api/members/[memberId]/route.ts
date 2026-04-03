@@ -136,39 +136,69 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
     promptsBySection.get(p.section_id)!.push(p);
   }
 
-  // Build response tree
-  const promptTree = (sections ?? []).map((section) => ({
-    id: section.id,
-    title: section.title,
-    step: section.step,
-    prompts: (promptsBySection.get(section.id) ?? []).map((prompt) => {
-      const options = optionsByPrompt.get(prompt.id) ?? [];
-      const rawResponse = responseMap.get(prompt.id) ?? null;
+  // Helper to extract storage path from a Supabase public URL
+  function extractStoragePath(url: string): string | null {
+    const marker = "/object/public/video-responses/";
+    const idx = url.indexOf(marker);
+    if (idx === -1) return null;
+    return url.substring(idx + marker.length);
+  }
 
-      // Resolve option labels for select types
-      let displayResponse: string | string[] | null = rawResponse;
-      if (rawResponse && prompt.type === "single_select") {
-        const opt = options.find((o) => o.id === rawResponse);
-        displayResponse = opt?.label ?? rawResponse;
-      } else if (rawResponse && prompt.type === "multi_select") {
-        try {
-          const ids: string[] = JSON.parse(rawResponse);
-          displayResponse = ids.map(
-            (id) => options.find((o) => o.id === id)?.label ?? id
-          );
-        } catch {
-          displayResponse = rawResponse;
-        }
-      }
+  // Build response tree, generating signed URLs for video responses
+  const promptTree = await Promise.all(
+    (sections ?? []).map(async (section) => ({
+      id: section.id,
+      title: section.title,
+      step: section.step,
+      prompts: await Promise.all(
+        (promptsBySection.get(section.id) ?? []).map(async (prompt) => {
+          const options = optionsByPrompt.get(prompt.id) ?? [];
+          const rawResponse = responseMap.get(prompt.id) ?? null;
 
-      return {
-        id: prompt.id,
-        label: prompt.label,
-        type: prompt.type,
-        response: displayResponse,
-      };
-    }),
-  }));
+          // Resolve option labels for select types
+          let displayResponse: string | string[] | null = rawResponse;
+          if (rawResponse && prompt.type === "single_select") {
+            const opt = options.find((o) => o.id === rawResponse);
+            displayResponse = opt?.label ?? rawResponse;
+          } else if (rawResponse && prompt.type === "multi_select") {
+            try {
+              const ids: string[] = JSON.parse(rawResponse);
+              displayResponse = ids.map(
+                (id) => options.find((o) => o.id === id)?.label ?? id
+              );
+            } catch {
+              displayResponse = rawResponse;
+            }
+          }
+
+          // Generate signed URL for video responses
+          if (
+            prompt.type === "video" &&
+            rawResponse &&
+            typeof rawResponse === "string" &&
+            rawResponse.includes("video-responses")
+          ) {
+            const filePath = extractStoragePath(rawResponse);
+            if (filePath) {
+              const { data } = await supabase.storage
+                .from("video-responses")
+                .createSignedUrl(filePath, 3600); // 1 hour expiry
+              if (data?.signedUrl) {
+                displayResponse = data.signedUrl;
+              }
+            }
+          }
+
+          return {
+            id: prompt.id,
+            label: prompt.label,
+            type: prompt.type,
+            response: displayResponse,
+          };
+        })
+      ),
+    }))
+  );
 
   return NextResponse.json({
     member: {
