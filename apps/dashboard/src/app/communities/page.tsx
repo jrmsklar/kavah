@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { createServiceClient } from "@kavah/db";
+import { getOwnedCommunities } from "@kavah/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -7,33 +7,7 @@ export default async function CommunitiesPage() {
   const { userId: clerkId } = await auth();
   if (!clerkId) redirect("/sign-in");
 
-  const supabase = createServiceClient();
-
-  const { data: user } = await supabase
-    .from("users")
-    .select("id")
-    .eq("clerk_id", clerkId)
-    .single();
-
-  if (!user) redirect("/sign-in");
-
-  const { data: memberships } = await supabase
-    .from("memberships")
-    .select("community_id")
-    .eq("user_id", user.id)
-    .eq("role", "owner");
-
-  const communityIds = memberships?.map((m) => m.community_id) ?? [];
-
-  let communities: { id: string; name: string; slug: string; description: string | null; created_at: string }[] = [];
-  if (communityIds.length > 0) {
-    const { data } = await supabase
-      .from("communities")
-      .select("id, name, slug, description, created_at")
-      .in("id", communityIds)
-      .order("created_at", { ascending: false });
-    communities = data ?? [];
-  }
+  const communities = await getOwnedCommunities(clerkId);
 
   if (communities.length === 0) {
     return (
