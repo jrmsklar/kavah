@@ -13,10 +13,11 @@ import { WelcomeStep } from "./welcome-step";
 import { SignupStep } from "./signup-step";
 import { BasicsStep } from "./basics-step";
 import { VideoStep } from "./video-step";
+import { ReviewStep } from "./review-step";
 import { StepProgress } from "./step-progress";
 import { AlreadyJoinedStep } from "./already-joined-step";
 
-type Step = "landing" | "welcome" | "basics" | "video" | "complete";
+type Step = "landing" | "welcome" | "basics" | "video" | "review" | "complete";
 
 export function JoinFlow() {
   const community = useCommunity();
@@ -103,7 +104,7 @@ export function JoinFlow() {
       setVideoPromptIndex(0);
       setStep("video");
     } else {
-      setStep("complete");
+      setStep("review");
     }
   }
 
@@ -113,7 +114,7 @@ export function JoinFlow() {
       setVideoPromptIndex(0);
       setStep("video");
     } else {
-      setStep("complete");
+      setStep("review");
     }
   }
 
@@ -122,7 +123,7 @@ export function JoinFlow() {
     if (videoPromptIndex < videoPrompts.length - 1) {
       setVideoPromptIndex((i) => i + 1);
     } else {
-      setStep("complete");
+      setStep("review");
     }
   }
 
@@ -268,6 +269,35 @@ export function JoinFlow() {
         onRecorded={handleUpdateResponse}
         onNext={handleVideoNext}
         onBack={handleVideoBack}
+      />
+    );
+  }
+
+  // STEP: Review (profile summary before submission)
+  if (step === "review") {
+    return (
+      <ReviewStep
+        firstName={firstName}
+        lastName={lastName}
+        birthday={birthday}
+        heightInches={heightInches}
+        city={city}
+        basicsSections={basicsSections}
+        responses={responses}
+        videoPrompts={videoPrompts}
+        onSubmit={handleComplete}
+        submitting={completing}
+        submitError={completeError}
+        onBack={() => {
+          if (hasVideos) {
+            setVideoPromptIndex(videoPrompts.length - 1);
+            setStep("video");
+          } else if (hasBasics) {
+            setStep("basics");
+          } else {
+            setStep("welcome");
+          }
+        }}
       />
     );
   }

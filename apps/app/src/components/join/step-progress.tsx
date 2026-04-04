@@ -1,6 +1,6 @@
 "use client";
 
-const steps = ["About You", "Basics", "Videos"];
+const steps = ["About You", "Basics", "Videos", "Profile"];
 
 export function StepProgress({ currentStep }: { currentStep: number }) {
   return (
