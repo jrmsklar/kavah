@@ -4,7 +4,7 @@ const steps = ["About You", "Basics", "Videos", "Profile"];
 
 export function StepProgress({ currentStep }: { currentStep: number }) {
   return (
-    <div className="flex items-center justify-center gap-2 py-5">
+    <div className="flex items-center justify-center gap-2 py-3">
       {steps.map((label, index) => {
         const stepNum = index + 1;
         const isCompleted = stepNum < currentStep;

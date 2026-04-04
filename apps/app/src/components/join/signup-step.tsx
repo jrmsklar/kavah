@@ -152,8 +152,8 @@ export function SignupStep({
     "mt-1.5 block w-full rounded-lg border border-border bg-warm px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold disabled:bg-cream disabled:text-ink-3";
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-6 py-12">
-      <div className="max-w-md w-full">
+    <div className="px-6 pb-12">
+      <div className="max-w-md mx-auto w-full">
         <h1 className="font-serif text-2xl font-medium text-ink">
           {isExistingUser ? "Confirm your info" : "Tell us about yourself"}
         </h1>

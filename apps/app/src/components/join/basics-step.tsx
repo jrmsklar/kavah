@@ -1,6 +1,5 @@
 "use client";
 
-import { StepProgress } from "./step-progress";
 import type { PromptSection, Prompt } from "@/types/prompts";
 
 export function BasicsStep({
@@ -23,9 +22,7 @@ export function BasicsStep({
   );
 
   return (
-    <div className="min-h-screen">
-      <StepProgress currentStep={2} />
-
+    <div>
       <div className="max-w-lg mx-auto px-5 pb-10">
         <h1 className="font-serif text-2xl font-medium text-ink mt-2">
           A few quick things

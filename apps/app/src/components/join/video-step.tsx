@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
-import { StepProgress } from "./step-progress";
 import { supabase } from "@kavah/db";
 import type { Prompt } from "@/types/prompts";
 
@@ -190,9 +189,7 @@ export function VideoStep({
   const canProceed = state === "recorded" || state === "done" || !!existingResponse;
 
   return (
-    <div className="min-h-screen">
-      <StepProgress currentStep={3} />
-
+    <div>
       <div className="max-w-lg mx-auto px-5 pb-10">
         {/* Prompt badge */}
         <div className="flex items-center gap-2 mt-2">

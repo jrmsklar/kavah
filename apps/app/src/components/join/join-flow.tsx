@@ -15,9 +15,19 @@ import { BasicsStep } from "./basics-step";
 import { VideoStep } from "./video-step";
 import { ReviewStep } from "./review-step";
 import { StepProgress } from "./step-progress";
+import { CommunityHeader } from "./community-header";
 import { AlreadyJoinedStep } from "./already-joined-step";
 
 type Step = "landing" | "welcome" | "basics" | "video" | "review" | "complete";
+
+const stepNumber: Record<Step, number> = {
+  landing: 0,
+  welcome: 1,
+  basics: 2,
+  video: 3,
+  review: 4,
+  complete: 0,
+};
 
 export function JoinFlow() {
   const community = useCommunity();
@@ -212,39 +222,40 @@ export function JoinFlow() {
     return <WelcomeStep onNext={() => setStep("welcome")} />;
   }
 
-  // STEP: Welcome (signup — name + phone verification)
+  // Steps that show community header + stepper
+  const currentStepNumber = stepNumber[step];
+
+  // Determine step content
+  let stepContent: React.ReactNode = null;
+
   if (step === "welcome") {
-    return (
-      <div>
-        <StepProgress currentStep={1} />
-        <SignupStep
-          signUp={signUp ?? undefined}
-          isLoaded={signUpLoaded}
-          isExistingUser={isExistingUser}
-          firstName={firstName}
-          setFirstName={setFirstName}
-          lastName={lastName}
-          setLastName={setLastName}
-          phone={phone}
-          setPhone={setPhone}
-          phoneVerified={phoneVerified}
-          setPhoneVerified={setPhoneVerified}
-          birthday={birthday}
-          setBirthday={setBirthday}
-          heightInches={heightInches}
-          setHeightInches={setHeightInches}
-          city={city}
-          setCity={setCity}
-          onSignUpComplete={handleSignUpComplete}
-          onNext={afterWelcome}
-        />
-      </div>
+    stepContent = (
+      <SignupStep
+        signUp={signUp ?? undefined}
+        isLoaded={signUpLoaded}
+        isExistingUser={isExistingUser}
+        firstName={firstName}
+        setFirstName={setFirstName}
+        lastName={lastName}
+        setLastName={setLastName}
+        phone={phone}
+        setPhone={setPhone}
+        phoneVerified={phoneVerified}
+        setPhoneVerified={setPhoneVerified}
+        birthday={birthday}
+        setBirthday={setBirthday}
+        heightInches={heightInches}
+        setHeightInches={setHeightInches}
+        city={city}
+        setCity={setCity}
+        onSignUpComplete={handleSignUpComplete}
+        onNext={afterWelcome}
+      />
     );
   }
 
-  // STEP: Basics
   if (step === "basics") {
-    return (
+    stepContent = (
       <BasicsStep
         sections={basicsSections}
         responses={responses}
@@ -254,7 +265,6 @@ export function JoinFlow() {
     );
   }
 
-  // STEP: Video (one prompt at a time)
   if (step === "video" && videoPrompts.length > 0) {
     const currentVideoPrompt = videoPrompts[videoPromptIndex];
     const resolvedClerkUserId =
@@ -262,7 +272,7 @@ export function JoinFlow() {
         ? user.id
         : clerkUserIdRef.current ?? signUp?.createdUserId ?? null;
 
-    return (
+    stepContent = (
       <VideoStep
         prompt={currentVideoPrompt}
         currentIndex={videoPromptIndex}
@@ -278,9 +288,8 @@ export function JoinFlow() {
     );
   }
 
-  // STEP: Review (profile summary before submission)
   if (step === "review") {
-    return (
+    stepContent = (
       <ReviewStep
         firstName={firstName}
         lastName={lastName}
@@ -305,6 +314,16 @@ export function JoinFlow() {
           }
         }}
       />
+    );
+  }
+
+  if (stepContent) {
+    return (
+      <div className="min-h-screen">
+        <CommunityHeader />
+        <StepProgress currentStep={currentStepNumber} />
+        {stepContent}
+      </div>
     );
   }
 

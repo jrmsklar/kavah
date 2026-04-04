@@ -1,47 +1,31 @@
 "use client";
 
 import { useCommunity } from "@/app/join/[community_slug]/community-context";
+import { CommunityHeader } from "./community-header";
 
 export function WelcomeStep({ onNext }: { onNext: () => void }) {
   const community = useCommunity();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-6 py-12">
-      <div className="max-w-md w-full text-center">
-        {community.icon_url ? (
-          <img
-            src={community.icon_url}
-            alt={community.name}
-            className="w-20 h-20 rounded-2xl mx-auto mb-8 object-cover shadow-sm"
-          />
-        ) : (
-          <div className="w-20 h-20 rounded-2xl mx-auto mb-8 bg-gold-pale flex items-center justify-center shadow-sm">
-            <span className="text-2xl font-semibold text-gold">
-              {community.name[0]?.toUpperCase()}
-            </span>
-          </div>
-        )}
+    <div className="min-h-screen flex flex-col">
+      <CommunityHeader />
 
-        <h1 className="font-serif text-3xl font-medium text-ink leading-tight">
-          {community.name}
-        </h1>
+      <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto px-6 pb-12 text-center">
+        <p className="text-xs font-semibold text-gold uppercase tracking-widest">
+          Community Matchmaking
+        </p>
 
-        {community.description && (
-          <p className="mt-3 text-ink-2 leading-relaxed">
-            {community.description}
-          </p>
-        )}
+        <p className="font-serif text-xl font-medium text-ink leading-snug mt-2">
+          Tell us who you are.{" "}
+          <em className="text-gold">Not what you do.</em>
+        </p>
 
-        <div className="mt-8 rounded-xl bg-warm border border-border-subtle p-5 text-left">
-          <p className="text-sm text-ink-2 leading-relaxed">
-            <span className="font-semibold text-ink">Kavah</span> helps
-            communities make meaningful introductions. Share a bit about
-            yourself, and your community organizer will match you with people
-            they think you&apos;d genuinely connect with.
-          </p>
-        </div>
+        <p className="mt-3 text-sm text-ink-2 leading-relaxed">
+          Short video prompts. No filter, no script — just you, the way
+          you&apos;d show up at a Friday night table.
+        </p>
 
-        <div className="mt-6 grid grid-cols-3 gap-3">
+        <div className="mt-8 grid grid-cols-3 gap-3">
           <div className="rounded-lg bg-warm border border-border-subtle p-3.5 text-center">
             <svg className="w-5 h-5 mx-auto text-gold" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
@@ -74,6 +58,13 @@ export function WelcomeStep({ onNext }: { onNext: () => void }) {
         >
           Join {community.name}
         </button>
+
+        <p className="mt-5 text-xs text-ink-3 leading-relaxed">
+          <span className="font-semibold text-ink-2">Kavah</span> helps
+          communities make meaningful introductions. Share a bit about
+          yourself, and your community organizer will match you with people
+          they think you&apos;d genuinely connect with.
+        </p>
       </div>
     </div>
   );

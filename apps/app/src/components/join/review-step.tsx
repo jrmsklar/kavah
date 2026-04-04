@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { StepProgress } from "./step-progress";
 import type { PromptSection, Prompt } from "@/types/prompts";
 
 function formatHeight(inches: number): string {
@@ -70,9 +69,7 @@ export function ReviewStep({
   }
 
   return (
-    <div className="min-h-screen">
-      <StepProgress currentStep={4} />
-
+    <div>
       <div className="max-w-lg mx-auto px-5 pb-10">
         <h1 className="font-serif text-2xl font-medium text-ink mt-2">
           Review your profile
