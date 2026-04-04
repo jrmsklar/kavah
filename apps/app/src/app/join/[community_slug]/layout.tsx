@@ -15,7 +15,7 @@ export default async function JoinLayout({
 
   const { data: community } = await supabase
     .from("communities")
-    .select("id, name, slug, description, icon_url")
+    .select("id, name, slug, description, icon_url, matchmaker_display_name")
     .eq("slug", community_slug)
     .single();
 

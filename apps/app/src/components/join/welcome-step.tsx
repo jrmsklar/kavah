@@ -21,7 +21,8 @@ export function WelcomeStep({ onNext }: { onNext: () => void }) {
         </p>
 
         <p className="mt-5 text-sm text-ink-2 leading-relaxed">
-          Danielle and Justin will personally match you
+          {community.matchmaker_display_name ?? "Your matchmaker"} will
+          personally match you
           within <span className="font-semibold text-ink">{community.name}</span> &ndash;{" "}
           {community.description}. Just answer four short video
           prompts &ndash; no filter, no script &ndash; and we&apos;ll take care

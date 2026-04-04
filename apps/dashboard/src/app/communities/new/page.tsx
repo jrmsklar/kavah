@@ -12,6 +12,7 @@ export default function NewCommunityPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [matchmakerName, setMatchmakerName] = useState("");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -90,6 +91,7 @@ export default function NewCommunityPage() {
       const formData = new FormData();
       formData.append("name", name);
       if (description.trim()) formData.append("description", description.trim());
+      if (matchmakerName.trim()) formData.append("matchmakerDisplayName", matchmakerName.trim());
       if (logoFile) formData.append("logo", logoFile);
 
       const res = await fetch("/api/communities", {
@@ -219,6 +221,27 @@ export default function NewCommunityPage() {
               placeholder="e.g. Friday Tables"
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
             />
+          </div>
+
+          <div>
+            <label
+              htmlFor="matchmakerName"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Matchmaker name(s){" "}
+              <span className="text-gray-400 font-normal">(optional)</span>
+            </label>
+            <input
+              id="matchmakerName"
+              type="text"
+              value={matchmakerName}
+              onChange={(e) => setMatchmakerName(e.target.value)}
+              placeholder="e.g. Danielle and Justin"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            />
+            <p className="mt-1 text-xs text-gray-400">
+              Shown to members on the join page as who&apos;s doing the matching.
+            </p>
           </div>
 
           <div>

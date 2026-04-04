@@ -20,6 +20,7 @@ export async function POST(req: Request) {
   const formData = await req.formData();
   const name = formData.get("name") as string | null;
   const description = formData.get("description") as string | null;
+  const matchmakerDisplayName = formData.get("matchmakerDisplayName") as string | null;
   const logoFile = formData.get("logo") as File | null;
 
   if (!name || name.trim().length === 0) {
@@ -86,6 +87,7 @@ export async function POST(req: Request) {
       name: name.trim(),
       slug,
       description: description?.trim() || null,
+      matchmaker_display_name: matchmakerDisplayName?.trim() || null,
       icon_url: iconUrl,
     })
     .select()

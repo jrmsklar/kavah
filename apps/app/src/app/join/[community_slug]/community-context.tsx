@@ -9,6 +9,7 @@ type Community = {
   slug: string;
   description: string | null;
   icon_url: string | null;
+  matchmaker_display_name: string | null;
 };
 
 export type UserProfile = {
