@@ -4,7 +4,58 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { supabase } from "@kavah/db";
 import type { Prompt } from "@/types/prompts";
 
+const MAX_RECORDING_SECONDS = 90;
+
 type RecordingState = "idle" | "preview" | "recording" | "recorded" | "uploading" | "done";
+
+function CircularProgress({ progress }: { progress: number }) {
+  const size = 72;
+  const strokeWidth = 4;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      {/* Background circle */}
+      <svg className="absolute inset-0" width={size} height={size}>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="rgba(255,255,255,0.15)"
+          strokeWidth={strokeWidth}
+        />
+      </svg>
+      {/* Progress circle */}
+      <svg
+        className="absolute inset-0 -rotate-90"
+        width={size}
+        height={size}
+      >
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="white"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          className="transition-[stroke-dashoffset] duration-300 ease-linear"
+        />
+      </svg>
+      {/* Percentage text */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-white text-sm font-medium tabular-nums">
+          {Math.round(progress)}%
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export function VideoStep({
   prompt,
@@ -45,6 +96,7 @@ export function VideoStep({
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     return () => {
@@ -62,6 +114,7 @@ export function VideoStep({
     setRecordedUrl(null);
     setElapsed(0);
     setError("");
+    setUploadProgress(0);
     setState(existingResponse ? "done" : "idle");
   }, [prompt.id]);
 
@@ -91,10 +144,13 @@ export function VideoStep({
     chunksRef.current = [];
     setElapsed(0);
 
+    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+      ? "video/webm;codecs=vp9"
+      : "video/webm";
+
     const recorder = new MediaRecorder(streamRef.current, {
-      mimeType: MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
-        ? "video/webm;codecs=vp9"
-        : "video/webm",
+      mimeType,
+      videoBitsPerSecond: 1_500_000,
     });
 
     recorder.ondataavailable = (e) => {
@@ -115,7 +171,13 @@ export function VideoStep({
     setState("recording");
 
     timerRef.current = setInterval(() => {
-      setElapsed((prev) => prev + 1);
+      setElapsed((prev) => {
+        const next = prev + 1;
+        if (next >= MAX_RECORDING_SECONDS) {
+          stopRecording();
+        }
+        return next;
+      });
     }, 1000);
   }
 
@@ -132,50 +194,87 @@ export function VideoStep({
     setRecordedBlob(null);
     setRecordedUrl(null);
     setElapsed(0);
+    setUploadProgress(0);
     await startCamera();
   }
 
   async function uploadAndAdvance() {
     const blob = recordedBlob;
     if (!blob) {
-      // Already uploaded (done state from existing response)
       onNext();
       return;
     }
 
     setState("uploading");
+    setUploadProgress(0);
     setError("");
 
     const userId = clerkUserId ?? "anonymous";
     const filePath = `${communityId}/${userId}/${prompt.id}.webm`;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    const { error: uploadError } = await supabase.storage
-      .from("video-responses")
-      .upload(filePath, blob, {
-        contentType: "video/webm",
-        upsert: true,
-      });
-
-    if (uploadError) {
-      setError(`Upload failed: ${uploadError.message}`);
+    if (!supabaseUrl || !supabaseKey) {
+      setError("Upload configuration missing.");
       setState("recorded");
       return;
     }
 
-    const { data: urlData } = supabase.storage
-      .from("video-responses")
-      .getPublicUrl(filePath);
+    const url = `${supabaseUrl}/storage/v1/object/video-responses/${filePath}`;
 
-    onRecorded(prompt.id, urlData.publicUrl, recordedUrl!);
-    setState("done");
-    onNext();
+    try {
+      const result = await new Promise<{ success: boolean; error?: string }>((resolve) => {
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener("progress", (e) => {
+          if (e.lengthComputable) {
+            setUploadProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        });
+
+        xhr.addEventListener("load", () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve({ success: true });
+          } else {
+            resolve({ success: false, error: `Upload failed (${xhr.status})` });
+          }
+        });
+
+        xhr.addEventListener("error", () => {
+          resolve({ success: false, error: "Upload failed. Check your connection." });
+        });
+
+        xhr.open("POST", url);
+        xhr.setRequestHeader("Authorization", `Bearer ${supabaseKey}`);
+        xhr.setRequestHeader("apikey", supabaseKey);
+        xhr.setRequestHeader("Content-Type", "video/webm");
+        xhr.setRequestHeader("x-upsert", "true");
+        xhr.send(blob);
+      });
+
+      if (!result.success) {
+        setError(result.error ?? "Upload failed");
+        setState("recorded");
+        return;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from("video-responses")
+        .getPublicUrl(filePath);
+
+      onRecorded(prompt.id, urlData.publicUrl, recordedUrl!);
+      setState("done");
+      onNext();
+    } catch {
+      setError("Upload failed. Please try again.");
+      setState("recorded");
+    }
   }
 
   function handleNext() {
     if (state === "recorded") {
       uploadAndAdvance();
     } else {
-      // Already done/uploaded
       onNext();
     }
   }
@@ -241,25 +340,25 @@ export function VideoStep({
             <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-rose animate-pulse" />
               <span className="text-white text-xs font-medium tabular-nums">
-                {formatTime(elapsed)}
+                {formatTime(elapsed)} / {formatTime(MAX_RECORDING_SECONDS)}
               </span>
             </div>
           )}
 
-          {state === "recorded" && recordedUrl && (
+          {(state === "recorded" || state === "uploading") && recordedUrl && (
             <video
               ref={playbackRef}
               src={recordedUrl}
               className="w-full h-full object-cover"
-              controls
               playsInline
             />
           )}
 
           {state === "uploading" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <p className="text-white/60 text-sm">Uploading video...</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60">
+              <CircularProgress progress={uploadProgress} />
+              <p className="text-white/80 text-sm font-medium mt-3">Uploading video...</p>
+              <p className="text-white/50 text-xs mt-1">Please don&apos;t close this tab</p>
             </div>
           )}
 
