@@ -306,7 +306,7 @@ export function SignupStep({
               value={birthday}
               onChange={(e) => setBirthday(e.target.value)}
               max={new Date().toISOString().split("T")[0]}
-              className={`${inputClass} h-[42px] max-w-full box-border`}
+              className={`${inputClass} min-w-0 appearance-none`}
             />
           </div>
 
