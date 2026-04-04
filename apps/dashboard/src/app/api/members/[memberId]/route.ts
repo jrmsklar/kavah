@@ -173,7 +173,6 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
 
           // Generate signed URL for video responses
           if (
-            prompt.type === "video" &&
             rawResponse &&
             typeof rawResponse === "string" &&
             rawResponse.includes("video-responses")
