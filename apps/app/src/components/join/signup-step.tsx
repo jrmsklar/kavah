@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useSignUp } from "@clerk/nextjs";
+import { useSignUp, useClerk } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 import { PhoneVerification } from "./phone-verification";
 
 type SignUpResource = NonNullable<ReturnType<typeof useSignUp>["signUp"]>;
@@ -47,6 +48,9 @@ export function SignupStep({
   onSignUpComplete: (sessionId: string, userId: string) => void;
   onNext: () => void;
 }) {
+  const clerk = useClerk();
+  const pathname = usePathname();
+
   const [verifying, setVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [verifyLoading, setVerifyLoading] = useState(false);
@@ -267,18 +271,25 @@ export function SignupStep({
                   This phone number is already associated with an account.
                 </p>
                 <p className="mt-1 text-sm text-ink-2">
-                  Please sign in with your existing account instead, or use a
-                  different phone number.
+                  Sign in to continue, or try a different number.
                 </p>
-                <button
-                  onClick={() => {
-                    setPhoneAlreadyExists(false);
-                    setPhone("");
-                  }}
-                  className="mt-2 text-sm font-medium text-rose underline underline-offset-2 hover:text-rose/80"
-                >
-                  Try a different number
-                </button>
+                <div className="mt-3 flex items-center gap-3">
+                  <button
+                    onClick={() => clerk.redirectToSignIn({ redirectUrl: pathname })}
+                    className="rounded-lg bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90 transition"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPhoneAlreadyExists(false);
+                      setPhone("");
+                    }}
+                    className="text-sm font-medium text-ink-2 underline underline-offset-2 hover:text-ink"
+                  >
+                    Try a different number
+                  </button>
+                </div>
               </div>
             )}
           </div>
