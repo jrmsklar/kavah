@@ -20,6 +20,16 @@ import { AlreadyJoinedStep } from "./already-joined-step";
 
 type Step = "landing" | "welcome" | "basics" | "video" | "review" | "complete";
 
+function PoweredByKavah() {
+  return (
+    <div className="py-6 text-center">
+      <p className="text-[11px] text-ink-3 tracking-wide">
+        powered by <span className="font-serif font-medium text-ink-2">kavah</span>
+      </p>
+    </div>
+  );
+}
+
 const stepNumber: Record<Step, number> = {
   landing: 0,
   welcome: 1,
@@ -319,10 +329,11 @@ export function JoinFlow() {
 
   if (stepContent) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen flex flex-col">
         <CommunityHeader />
         <StepProgress currentStep={currentStepNumber} />
-        {stepContent}
+        <div className="flex-1">{stepContent}</div>
+        <PoweredByKavah />
       </div>
     );
   }
@@ -375,6 +386,7 @@ export function JoinFlow() {
             Done
           </button>
         </div>
+        <PoweredByKavah />
       </div>
     );
   }

@@ -66,6 +66,12 @@ export function WelcomeStep({ onNext }: { onNext: () => void }) {
           they think you&apos;d genuinely connect with.
         </p>
       </div>
+
+      <div className="py-6 text-center">
+        <p className="text-[11px] text-ink-3 tracking-wide">
+          powered by <span className="font-serif font-medium text-ink-2">kavah</span>
+        </p>
+      </div>
     </div>
   );
 }
