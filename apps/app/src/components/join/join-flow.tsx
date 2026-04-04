@@ -6,18 +6,21 @@ import { useRouter } from "next/navigation";
 import {
   useCommunity,
   usePromptSections,
+  useIsMember,
 } from "@/app/join/[community_slug]/community-context";
 import { WelcomeStep } from "./welcome-step";
 import { SignupStep } from "./signup-step";
 import { BasicsStep } from "./basics-step";
 import { VideoStep } from "./video-step";
 import { StepProgress } from "./step-progress";
+import { AlreadyJoinedStep } from "./already-joined-step";
 
 type Step = "landing" | "welcome" | "basics" | "video" | "complete";
 
 export function JoinFlow() {
   const community = useCommunity();
   const promptSections = usePromptSections();
+  const isMember = useIsMember();
   const router = useRouter();
   const { signUp, isLoaded: signUpLoaded, setActive } = useSignUp();
   const { user, isSignedIn, isLoaded: userLoaded } = useUser();
@@ -178,6 +181,11 @@ export function JoinFlow() {
         <p className="text-gray-500">Loading...</p>
       </div>
     );
+  }
+
+  // Already a member — show message instead of join flow
+  if (step === "landing" && isMember) {
+    return <AlreadyJoinedStep />;
   }
 
   // STEP: Landing (community info + Join CTA)

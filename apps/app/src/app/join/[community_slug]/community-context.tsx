@@ -14,6 +14,7 @@ type Community = {
 type CommunityContextValue = {
   community: Community;
   promptSections: PromptSection[];
+  isMember: boolean;
 };
 
 const CommunityContext = createContext<CommunityContextValue | null>(null);
@@ -21,14 +22,16 @@ const CommunityContext = createContext<CommunityContextValue | null>(null);
 export function CommunityProvider({
   community,
   promptSections,
+  isMember,
   children,
 }: {
   community: Community;
   promptSections: PromptSection[];
+  isMember: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <CommunityContext.Provider value={{ community, promptSections }}>
+    <CommunityContext.Provider value={{ community, promptSections, isMember }}>
       {children}
     </CommunityContext.Provider>
   );
@@ -48,4 +51,12 @@ export function usePromptSections() {
     throw new Error("usePromptSections must be used within a CommunityProvider");
   }
   return context.promptSections;
+}
+
+export function useIsMember() {
+  const context = useContext(CommunityContext);
+  if (!context) {
+    throw new Error("useIsMember must be used within a CommunityProvider");
+  }
+  return context.isMember;
 }

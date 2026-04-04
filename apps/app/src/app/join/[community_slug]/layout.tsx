@@ -1,4 +1,5 @@
 import { createServiceClient } from "@kavah/db";
+import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 import { CommunityProvider } from "./community-context";
 
@@ -19,6 +20,30 @@ export default async function JoinLayout({
     .single();
 
   if (!community) notFound();
+
+  // Check if logged-in user is already a member
+  let isMember = false;
+  try {
+    const { userId: clerkUserId } = await auth();
+    if (clerkUserId) {
+      const { data: user } = await supabase
+        .from("users")
+        .select("id")
+        .eq("clerk_id", clerkUserId)
+        .single();
+      if (user) {
+        const { data: membership } = await supabase
+          .from("memberships")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("community_id", community.id)
+          .single();
+        isMember = !!membership;
+      }
+    }
+  } catch {
+    // Not authenticated — continue as non-member
+  }
 
   // Fetch prompt sections with prompts and options
   const { data: sections } = await supabase
@@ -84,7 +109,7 @@ export default async function JoinLayout({
   }));
 
   return (
-    <CommunityProvider community={community} promptSections={promptSections}>
+    <CommunityProvider community={community} promptSections={promptSections} isMember={isMember}>
       {children}
     </CommunityProvider>
   );
