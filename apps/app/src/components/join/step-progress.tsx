@@ -4,17 +4,17 @@ const steps = ["About You", "Basics", "Videos", "Profile"];
 
 export function StepProgress({ currentStep }: { currentStep: number }) {
   return (
-    <div className="flex items-center justify-center gap-2 py-3">
+    <div className="flex items-center justify-center gap-1 sm:gap-2 py-4 px-3">
       {steps.map((label, index) => {
         const stepNum = index + 1;
         const isCompleted = stepNum < currentStep;
         const isActive = stepNum === currentStep;
 
         return (
-          <div key={label} className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5">
+          <div key={label} className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
               <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-colors flex-shrink-0 ${
                   isCompleted
                     ? "bg-sage text-white"
                     : isActive
@@ -31,7 +31,7 @@ export function StepProgress({ currentStep }: { currentStep: number }) {
                 )}
               </div>
               <span
-                className={`text-xs font-medium ${
+                className={`text-[11px] sm:text-xs font-medium whitespace-nowrap ${
                   isActive ? "text-ink" : isCompleted ? "text-ink-2" : "text-ink-3"
                 }`}
               >
@@ -39,7 +39,7 @@ export function StepProgress({ currentStep }: { currentStep: number }) {
               </span>
             </div>
             {index < steps.length - 1 && (
-              <div className={`w-8 h-px ${isCompleted ? "bg-sage" : "bg-border"}`} />
+              <div className={`w-4 sm:w-8 h-px flex-shrink-0 ${isCompleted ? "bg-sage" : "bg-border"}`} />
             )}
           </div>
         );
