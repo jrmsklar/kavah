@@ -7,6 +7,7 @@ import {
   useCommunity,
   usePromptSections,
   useIsMember,
+  useUserProfile,
 } from "@/app/join/[community_slug]/community-context";
 import { WelcomeStep } from "./welcome-step";
 import { SignupStep } from "./signup-step";
@@ -21,6 +22,7 @@ export function JoinFlow() {
   const community = useCommunity();
   const promptSections = usePromptSections();
   const isMember = useIsMember();
+  const userProfile = useUserProfile();
   const router = useRouter();
   const { signUp, isLoaded: signUpLoaded, setActive } = useSignUp();
   const { user, isSignedIn, isLoaded: userLoaded } = useUser();
@@ -67,7 +69,7 @@ export function JoinFlow() {
   const hasBasics = basicsSections.length > 0;
   const hasVideos = videoPrompts.length > 0;
 
-  // Pre-fill from existing Clerk user
+  // Pre-fill from existing Clerk user + user_profiles
   useEffect(() => {
     if (isExistingUser && user) {
       setFirstName(user.firstName ?? "");
@@ -75,8 +77,14 @@ export function JoinFlow() {
       const rawPhone = user.primaryPhoneNumber?.phoneNumber ?? "";
       setPhone(rawPhone.replace(/^\+1/, ""));
       setPhoneVerified(true);
+
+      if (userProfile) {
+        if (userProfile.birthday) setBirthday(userProfile.birthday);
+        if (userProfile.height_inches) setHeightInches(userProfile.height_inches);
+        if (userProfile.city) setCity(userProfile.city);
+      }
     }
-  }, [isExistingUser, user]);
+  }, [isExistingUser, user, userProfile]);
 
   function handleSignUpComplete(sessionId: string, userId: string) {
     clerkSessionIdRef.current = sessionId;

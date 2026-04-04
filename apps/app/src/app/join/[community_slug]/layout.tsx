@@ -21,8 +21,9 @@ export default async function JoinLayout({
 
   if (!community) notFound();
 
-  // Check if logged-in user is already a member
+  // Check if logged-in user is already a member + fetch their profile
   let isMember = false;
+  let userProfile: { birthday: string | null; height_inches: number | null; city: string | null } | null = null;
   try {
     const { userId: clerkUserId } = await auth();
     if (clerkUserId) {
@@ -39,6 +40,15 @@ export default async function JoinLayout({
           .eq("community_id", community.id)
           .single();
         isMember = !!membership;
+
+        const { data: profile } = await supabase
+          .from("user_profiles")
+          .select("birthday, height_inches, city")
+          .eq("user_id", user.id)
+          .single();
+        if (profile) {
+          userProfile = profile;
+        }
       }
     }
   } catch {
@@ -109,7 +119,7 @@ export default async function JoinLayout({
   }));
 
   return (
-    <CommunityProvider community={community} promptSections={promptSections} isMember={isMember}>
+    <CommunityProvider community={community} promptSections={promptSections} isMember={isMember} userProfile={userProfile}>
       {children}
     </CommunityProvider>
   );

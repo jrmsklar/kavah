@@ -11,10 +11,17 @@ type Community = {
   icon_url: string | null;
 };
 
+export type UserProfile = {
+  birthday: string | null;
+  height_inches: number | null;
+  city: string | null;
+};
+
 type CommunityContextValue = {
   community: Community;
   promptSections: PromptSection[];
   isMember: boolean;
+  userProfile: UserProfile | null;
 };
 
 const CommunityContext = createContext<CommunityContextValue | null>(null);
@@ -23,15 +30,17 @@ export function CommunityProvider({
   community,
   promptSections,
   isMember,
+  userProfile,
   children,
 }: {
   community: Community;
   promptSections: PromptSection[];
   isMember: boolean;
+  userProfile: UserProfile | null;
   children: React.ReactNode;
 }) {
   return (
-    <CommunityContext.Provider value={{ community, promptSections, isMember }}>
+    <CommunityContext.Provider value={{ community, promptSections, isMember, userProfile }}>
       {children}
     </CommunityContext.Provider>
   );
@@ -59,4 +68,12 @@ export function useIsMember() {
     throw new Error("useIsMember must be used within a CommunityProvider");
   }
   return context.isMember;
+}
+
+export function useUserProfile() {
+  const context = useContext(CommunityContext);
+  if (!context) {
+    throw new Error("useUserProfile must be used within a CommunityProvider");
+  }
+  return context.userProfile;
 }
