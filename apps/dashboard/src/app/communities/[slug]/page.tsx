@@ -92,9 +92,16 @@ export default async function CommunityDetailPage({
       </Link>
 
       <div className="mt-6">
+        {community.icon_url && (
+          <img
+            src={community.icon_url}
+            alt={community.name}
+            className="h-14 mb-4"
+          />
+        )}
         <h1 className="text-3xl font-bold text-gray-900">{community.name}</h1>
         {community.description && (
-          <p className="mt-2 text-gray-600">{community.description}</p>
+          <p className="mt-1 text-gray-600">{community.description}</p>
         )}
         <p className="mt-1 text-sm text-gray-400">
           Created {new Date(community.created_at).toLocaleDateString()}
