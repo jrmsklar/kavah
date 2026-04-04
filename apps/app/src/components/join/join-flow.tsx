@@ -46,6 +46,7 @@ export function JoinFlow() {
   const [heightInches, setHeightInches] = useState<number | null>(null);
   const [city, setCity] = useState("");
   const [responses, setResponses] = useState<Record<string, string>>({});
+  const [localVideoUrls, setLocalVideoUrls] = useState<Record<string, string>>({});
   const [videoPromptIndex, setVideoPromptIndex] = useState(0);
   const [completing, setCompleting] = useState(false);
   const [completeError, setCompleteError] = useState("");
@@ -92,8 +93,11 @@ export function JoinFlow() {
     clerkUserIdRef.current = userId;
   }
 
-  function handleUpdateResponse(promptId: string, value: string) {
+  function handleUpdateResponse(promptId: string, value: string, localUrl?: string) {
     setResponses((prev) => ({ ...prev, [promptId]: value }));
+    if (localUrl) {
+      setLocalVideoUrls((prev) => ({ ...prev, [promptId]: localUrl }));
+    }
   }
 
   // Determine what happens after welcome (signup) step
@@ -266,6 +270,7 @@ export function JoinFlow() {
         communityId={community.id}
         clerkUserId={resolvedClerkUserId}
         existingResponse={responses[currentVideoPrompt.id] ?? null}
+        localVideoUrl={localVideoUrls[currentVideoPrompt.id] ?? null}
         onRecorded={handleUpdateResponse}
         onNext={handleVideoNext}
         onBack={handleVideoBack}
@@ -285,6 +290,7 @@ export function JoinFlow() {
         basicsSections={basicsSections}
         responses={responses}
         videoPrompts={videoPrompts}
+        localVideoUrls={localVideoUrls}
         onSubmit={handleComplete}
         submitting={completing}
         submitError={completeError}

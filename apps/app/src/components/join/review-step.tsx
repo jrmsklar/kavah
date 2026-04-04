@@ -19,6 +19,7 @@ export function ReviewStep({
   basicsSections,
   responses,
   videoPrompts,
+  localVideoUrls,
   onSubmit,
   submitting,
   submitError,
@@ -32,6 +33,7 @@ export function ReviewStep({
   basicsSections: PromptSection[];
   responses: Record<string, string>;
   videoPrompts: Prompt[];
+  localVideoUrls: Record<string, string>;
   onSubmit: () => void;
   submitting: boolean;
   submitError: string;
@@ -147,7 +149,7 @@ export function ReviewStep({
             </h2>
             <div className="mt-3 space-y-3">
               {videoPrompts.map((prompt, index) => {
-                const videoUrl = responses[prompt.id];
+                const videoUrl = localVideoUrls[prompt.id] || responses[prompt.id];
                 const isExpanded = expandedVideo === prompt.id;
 
                 return (

@@ -5,7 +5,7 @@ import { StepProgress } from "./step-progress";
 import { supabase } from "@kavah/db";
 import type { Prompt } from "@/types/prompts";
 
-type RecordingState = "idle" | "preview" | "recording" | "review" | "uploading" | "done";
+type RecordingState = "idle" | "preview" | "recording" | "recorded" | "uploading" | "done";
 
 export function VideoStep({
   prompt,
@@ -14,6 +14,7 @@ export function VideoStep({
   communityId,
   clerkUserId,
   existingResponse,
+  localVideoUrl,
   onRecorded,
   onNext,
   onBack,
@@ -24,7 +25,8 @@ export function VideoStep({
   communityId: string;
   clerkUserId: string | null;
   existingResponse: string | null;
-  onRecorded: (promptId: string, videoUrl: string) => void;
+  localVideoUrl?: string | null;
+  onRecorded: (promptId: string, videoUrl: string, localUrl: string) => void;
   onNext: () => void;
   onBack: () => void;
 }) {
@@ -44,7 +46,6 @@ export function VideoStep({
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState("");
-  const [uploadProgress, setUploadProgress] = useState("");
 
   useEffect(() => {
     return () => {
@@ -62,7 +63,6 @@ export function VideoStep({
     setRecordedUrl(null);
     setElapsed(0);
     setError("");
-    setUploadProgress("");
     setState(existingResponse ? "done" : "idle");
   }, [prompt.id]);
 
@@ -108,7 +108,7 @@ export function VideoStep({
       setRecordedBlob(blob);
       setRecordedUrl(url);
       stopStream();
-      setState("review");
+      setState("recorded");
     };
 
     recorder.start();
@@ -136,24 +136,30 @@ export function VideoStep({
     await startCamera();
   }
 
-  async function handleUseVideo() {
-    if (!recordedBlob) return;
+  async function uploadAndAdvance() {
+    const blob = recordedBlob;
+    if (!blob) {
+      // Already uploaded (done state from existing response)
+      onNext();
+      return;
+    }
+
     setState("uploading");
-    setUploadProgress("Uploading video...");
+    setError("");
 
     const userId = clerkUserId ?? "anonymous";
     const filePath = `${communityId}/${userId}/${prompt.id}.webm`;
 
     const { error: uploadError } = await supabase.storage
       .from("video-responses")
-      .upload(filePath, recordedBlob, {
+      .upload(filePath, blob, {
         contentType: "video/webm",
         upsert: true,
       });
 
     if (uploadError) {
       setError(`Upload failed: ${uploadError.message}`);
-      setState("review");
+      setState("recorded");
       return;
     }
 
@@ -161,10 +167,18 @@ export function VideoStep({
       .from("video-responses")
       .getPublicUrl(filePath);
 
-    const publicUrl = urlData.publicUrl;
-    onRecorded(prompt.id, publicUrl);
+    onRecorded(prompt.id, urlData.publicUrl, recordedUrl!);
     setState("done");
-    setUploadProgress("");
+    onNext();
+  }
+
+  function handleNext() {
+    if (state === "recorded") {
+      uploadAndAdvance();
+    } else {
+      // Already done/uploaded
+      onNext();
+    }
   }
 
   function formatTime(seconds: number) {
@@ -173,7 +187,7 @@ export function VideoStep({
     return `${m}:${s.toString().padStart(2, "0")}`;
   }
 
-  const canProceed = state === "done" || !!existingResponse;
+  const canProceed = state === "recorded" || state === "done" || !!existingResponse;
 
   return (
     <div className="min-h-screen">
@@ -235,7 +249,7 @@ export function VideoStep({
             </div>
           )}
 
-          {state === "review" && recordedUrl && (
+          {state === "recorded" && recordedUrl && (
             <video
               ref={playbackRef}
               src={recordedUrl}
@@ -248,11 +262,20 @@ export function VideoStep({
           {state === "uploading" && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
               <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <p className="text-white/60 text-sm">{uploadProgress}</p>
+              <p className="text-white/60 text-sm">Uploading video...</p>
             </div>
           )}
 
-          {state === "done" && (
+          {state === "done" && (localVideoUrl || existingResponse) && (
+            <video
+              src={localVideoUrl || existingResponse!}
+              className="w-full h-full object-cover"
+              controls
+              playsInline
+            />
+          )}
+
+          {state === "done" && !localVideoUrl && !existingResponse && !recordedBlob && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
               <div className="w-14 h-14 rounded-full bg-sage/20 flex items-center justify-center">
                 <svg className="w-7 h-7 text-sage" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -285,30 +308,22 @@ export function VideoStep({
           </button>
         )}
 
-        {state === "review" && (
-          <div className="mt-4 flex gap-3">
+        {/* Video Recorded tooltip */}
+        {(state === "recorded" || state === "done") && (
+          <div className="mt-4 space-y-3">
+            <div className="rounded-xl border border-sage/20 bg-sage-light px-5 py-3.5 flex items-center gap-2.5">
+              <svg className="w-4.5 h-4.5 text-sage flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+              <span className="text-sm font-medium text-sage">Recorded</span>
+            </div>
             <button
               onClick={handleReRecord}
-              className="flex-1 rounded-xl border border-border bg-warm px-4 py-3 text-sm font-medium text-ink-2 hover:bg-cream transition"
+              className="rounded-xl border border-border bg-warm px-4 py-2.5 text-sm font-medium text-ink-2 hover:bg-cream transition"
             >
               Re-record
             </button>
-            <button
-              onClick={handleUseVideo}
-              className="flex-1 rounded-xl bg-sage px-4 py-3 text-sm font-semibold text-white hover:bg-sage/90 transition"
-            >
-              Use this video
-            </button>
           </div>
-        )}
-
-        {state === "done" && !existingResponse && (
-          <button
-            onClick={handleReRecord}
-            className="mt-4 w-full rounded-xl border border-border bg-warm px-6 py-3 text-sm font-medium text-ink-2 hover:bg-cream transition"
-          >
-            Re-record
-          </button>
         )}
 
         {error && <p className="mt-3 text-sm text-rose">{error}</p>}
@@ -317,16 +332,21 @@ export function VideoStep({
         <div className="mt-6 flex gap-3">
           <button
             onClick={onBack}
-            className="rounded-xl border border-border bg-warm px-5 py-3 text-sm font-medium text-ink-2 hover:bg-cream transition"
+            disabled={state === "uploading"}
+            className="rounded-xl border border-border bg-warm px-5 py-3 text-sm font-medium text-ink-2 hover:bg-cream transition disabled:opacity-40"
           >
             Back
           </button>
           <button
-            onClick={onNext}
-            disabled={!canProceed}
+            onClick={handleNext}
+            disabled={!canProceed || state === "uploading"}
             className="flex-1 rounded-xl bg-ink px-6 py-3 text-sm font-semibold text-white hover:bg-ink/90 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {isLast ? "Finish" : "Next prompt"}
+            {state === "uploading"
+              ? "Uploading..."
+              : isLast
+                ? "Finish"
+                : "Next prompt"}
           </button>
         </div>
       </div>
