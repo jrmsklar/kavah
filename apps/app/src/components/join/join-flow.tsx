@@ -181,7 +181,7 @@ export function JoinFlow() {
         await setActive({ session: sessionId });
       }
 
-      router.push("/");
+      setStep("complete");
     } catch (err) {
       setCompleteError(
         err instanceof Error ? err.message : "Something went wrong."
@@ -302,43 +302,52 @@ export function JoinFlow() {
     );
   }
 
-  // STEP: Complete
+  // STEP: Complete (success confirmation)
   if (step === "complete") {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
-        <div className="max-w-md w-full text-center">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-sage-light flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-sage"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4.5 12.75l6 6 9-13.5"
-              />
-            </svg>
-          </div>
-          <h1 className="font-serif text-2xl font-medium text-ink">
-            You&apos;re all set!
-          </h1>
-          <p className="mt-2 text-ink-2">
-            Complete your registration to join {community.name}.
-          </p>
-
-          {completeError && (
-            <p className="mt-4 text-sm text-rose">{completeError}</p>
+      <div className="min-h-screen flex items-center justify-center px-6 py-12">
+        <div className="max-w-md w-full rounded-2xl border border-border bg-warm p-10 text-center">
+          {community.icon_url && (
+            <img
+              src={community.icon_url}
+              alt={community.name}
+              className="w-14 h-14 mx-auto mb-5 rounded-xl"
+            />
           )}
 
+          <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-sage-light flex items-center justify-center">
+            <svg className="w-7 h-7 text-sage" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </div>
+
+          <h1 className="font-serif text-3xl font-medium text-ink">
+            You&apos;re in the pool.
+          </h1>
+
+          <p className="mt-4 text-ink-2 leading-relaxed">
+            Your profile has been received. The {community.name} matchmaker will
+            review your responses personally and reach out when there&apos;s a
+            thoughtful match.
+          </p>
+
+          <p className="mt-4 text-ink-3 italic leading-relaxed">
+            No algorithm. No swiping. Just a real introduction when the time is
+            right.
+          </p>
+
+          <div className="mt-6">
+            <p className="font-serif text-2xl text-gold">&#1489;&#1492;&#1510;&#1500;&#1495;&#1492;</p>
+            <p className="mt-1 text-sm text-ink-3 italic">
+              B&apos;hatzlacha — good luck
+            </p>
+          </div>
+
           <button
-            onClick={handleComplete}
-            disabled={completing}
-            className="mt-8 w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={() => router.push("/")}
+            className="mt-8 w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm"
           >
-            {completing ? "Completing..." : "Complete"}
+            Done
           </button>
         </div>
       </div>
