@@ -28,11 +28,9 @@ export function CommunityHeader() {
           </h2>
         )}
 
-        {community.description && (
-          <p className="mt-1 text-sm text-ink-2 leading-relaxed">
-            {community.description}
-          </p>
-        )}
+        <p className="mt-1 text-xs text-ink-3 tracking-wide">
+          Set ups powered by <span className="font-serif font-medium text-ink-2">Kavah</span>
+        </p>
       </div>
     </div>
   );
