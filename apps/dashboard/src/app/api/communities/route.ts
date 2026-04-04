@@ -17,8 +17,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { name, description } = await req.json();
-  if (!name || typeof name !== "string" || name.trim().length === 0) {
+  const formData = await req.formData();
+  const name = formData.get("name") as string | null;
+  const description = formData.get("description") as string | null;
+  const logoFile = formData.get("logo") as File | null;
+
+  if (!name || name.trim().length === 0) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
 
@@ -33,6 +37,34 @@ export async function POST(req: Request) {
 
   if (userError || !user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  // Upload logo if provided
+  let iconUrl: string | null = null;
+  if (logoFile && logoFile.size > 0) {
+    const ext = logoFile.name.split(".").pop() ?? "png";
+    const filePath = `${crypto.randomUUID()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("community-logos")
+      .upload(filePath, logoFile, {
+        contentType: logoFile.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("Logo upload error:", uploadError);
+      return NextResponse.json(
+        { error: "Failed to upload logo" },
+        { status: 500 }
+      );
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("community-logos")
+      .getPublicUrl(filePath);
+
+    iconUrl = urlData.publicUrl;
   }
 
   // Generate slug and ensure uniqueness
@@ -54,6 +86,7 @@ export async function POST(req: Request) {
       name: name.trim(),
       slug,
       description: description?.trim() || null,
+      icon_url: iconUrl,
     })
     .select()
     .single();
