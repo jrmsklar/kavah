@@ -150,7 +150,7 @@ export function VideoStep({
 
     const recorder = new MediaRecorder(streamRef.current, {
       mimeType,
-      videoBitsPerSecond: 1_500_000,
+      videoBitsPerSecond: 1_000_000,
     });
 
     recorder.ondataavailable = (e) => {
