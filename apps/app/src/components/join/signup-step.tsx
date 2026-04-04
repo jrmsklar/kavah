@@ -40,6 +40,14 @@ export function SignupStep({
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [sendingCode, setSendingCode] = useState(false);
   const [phoneAlreadyExists, setPhoneAlreadyExists] = useState(false);
+  const [country, setCountry] = useState("US");
+
+  function formatPhoneDisplay(digits: string): string {
+    if (digits.length === 0) return "";
+    if (digits.length <= 3) return `(${digits}`;
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
 
   const canSendCode =
     isLoaded && firstName.trim() && lastName.trim() && phone.length >= 10 && !phoneVerified && !verifying;
@@ -51,7 +59,7 @@ export function SignupStep({
     setPhoneAlreadyExists(false);
 
     try {
-      const formattedPhone = phone.startsWith("+") ? phone : `+1${phone.replace(/\D/g, "")}`;
+      const formattedPhone = `+1${phone}`;
       await signUp.create({
         phoneNumber: formattedPhone,
         firstName: firstName.trim(),
@@ -177,17 +185,39 @@ export function SignupStep({
               Phone Number
             </label>
             <div className="mt-1 flex gap-2">
-              <input
-                id="phone"
-                type="tel"
-                value={phone}
-                onChange={(e) => {
-                  if (!phoneVerified) setPhone(e.target.value);
-                }}
-                disabled={phoneVerified}
-                placeholder="+1 (555) 000-0000"
-                className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black disabled:bg-gray-50 disabled:text-gray-500"
-              />
+              <div className="flex flex-1 rounded-md border border-gray-300 shadow-sm focus-within:border-black focus-within:ring-1 focus-within:ring-black overflow-hidden">
+                <div className="relative flex items-center">
+                  <select
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    disabled={phoneVerified}
+                    className="appearance-none bg-gray-50 pl-3 pr-7 py-2 text-sm text-gray-700 border-r border-gray-300 focus:outline-none cursor-pointer disabled:cursor-default disabled:text-gray-500"
+                  >
+                    <option value="US">US</option>
+                    <option value="CA">CA</option>
+                  </select>
+                  <svg className="pointer-events-none absolute right-1.5 w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </div>
+                <span className="flex items-center px-2 text-sm text-gray-500 select-none">
+                  +1
+                </span>
+                <input
+                  id="phone"
+                  type="tel"
+                  value={formatPhoneDisplay(phone)}
+                  onChange={(e) => {
+                    if (!phoneVerified) {
+                      const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                      setPhone(digits);
+                    }
+                  }}
+                  disabled={phoneVerified}
+                  placeholder="(555) 000-0000"
+                  className="flex-1 px-2 py-2 text-sm border-0 focus:outline-none focus:ring-0 disabled:bg-gray-50 disabled:text-gray-500"
+                />
+              </div>
               {phoneVerified ? (
                 <span className="flex items-center gap-1 text-sm text-green-600 font-medium px-3">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

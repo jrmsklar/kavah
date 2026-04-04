@@ -66,7 +66,8 @@ export function JoinFlow() {
     if (isExistingUser && user) {
       setFirstName(user.firstName ?? "");
       setLastName(user.lastName ?? "");
-      setPhone(user.primaryPhoneNumber?.phoneNumber ?? "");
+      const rawPhone = user.primaryPhoneNumber?.phoneNumber ?? "";
+      setPhone(rawPhone.replace(/^\+1/, ""));
       setPhoneVerified(true);
     }
   }, [isExistingUser, user]);
@@ -145,7 +146,7 @@ export function JoinFlow() {
           communityId: community.id,
           firstName: firstName.trim(),
           lastName: lastName.trim(),
-          phone,
+          phone: phone.startsWith("+") ? phone : `+1${phone}`,
           clerkUserId,
           responses,
         }),
