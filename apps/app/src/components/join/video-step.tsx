@@ -111,7 +111,7 @@ export function VideoStep({
       setState("review");
     };
 
-    recorder.start(1000);
+    recorder.start();
     mediaRecorderRef.current = recorder;
     setState("recording");
 
@@ -214,7 +214,7 @@ export function VideoStep({
             <video
               ref={(el) => {
                 videoRef.current = el;
-                if (el && streamRef.current) {
+                if (el && streamRef.current && el.srcObject !== streamRef.current) {
                   el.srcObject = streamRef.current;
                 }
               }}
