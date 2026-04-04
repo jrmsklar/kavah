@@ -348,7 +348,7 @@ export function JoinFlow() {
               <img
                 src={community.icon_url}
                 alt={community.name}
-                className="w-14 h-14 mx-auto mb-5 rounded-xl"
+                className="h-14 mx-auto mb-5"
               />
             )}
 
