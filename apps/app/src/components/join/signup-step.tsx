@@ -153,7 +153,7 @@ export function SignupStep({
 
   return (
     <div className="px-6 pb-12">
-      <div className="max-w-md mx-auto w-full">
+      <div className="max-w-md mx-auto w-full overflow-hidden">
         <h1 className="font-serif text-2xl font-medium text-ink">
           {isExistingUser ? "Confirm your info" : "Tell us about yourself"}
         </h1>
@@ -306,7 +306,7 @@ export function SignupStep({
               value={birthday}
               onChange={(e) => setBirthday(e.target.value)}
               max={new Date().toISOString().split("T")[0]}
-              className={inputClass}
+              className={`${inputClass} h-[42px] max-w-full box-border`}
             />
           </div>
 
