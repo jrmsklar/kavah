@@ -350,6 +350,7 @@ export function VideoStep({
               ref={playbackRef}
               src={recordedUrl}
               className="w-full h-full object-cover"
+              controls
               playsInline
             />
           )}
