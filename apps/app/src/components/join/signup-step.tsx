@@ -153,7 +153,7 @@ export function SignupStep({
 
   return (
     <div className="px-6 pb-12">
-      <div className="max-w-md mx-auto w-full overflow-hidden">
+      <div className="max-w-md mx-auto w-full">
         <h1 className="font-serif text-2xl font-medium text-ink">
           {isExistingUser ? "Confirm your info" : "Tell us about yourself"}
         </h1>
