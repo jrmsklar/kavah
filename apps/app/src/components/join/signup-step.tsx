@@ -18,6 +18,12 @@ export function SignupStep({
   setPhone,
   phoneVerified,
   setPhoneVerified,
+  birthday,
+  setBirthday,
+  heightInches,
+  setHeightInches,
+  city,
+  setCity,
   onSignUpComplete,
   onNext,
 }: {
@@ -32,6 +38,12 @@ export function SignupStep({
   setPhone: (v: string) => void;
   phoneVerified: boolean;
   setPhoneVerified: (v: boolean) => void;
+  birthday: string;
+  setBirthday: (v: string) => void;
+  heightInches: number | null;
+  setHeightInches: (v: number | null) => void;
+  city: string;
+  setCity: (v: string) => void;
   onSignUpComplete: (sessionId: string, userId: string) => void;
   onNext: () => void;
 }) {
@@ -135,7 +147,7 @@ export function SignupStep({
   }
 
   const canProceed =
-    firstName.trim() && lastName.trim() && phoneVerified;
+    firstName.trim() && lastName.trim() && phoneVerified && birthday && heightInches !== null && city.trim();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
@@ -238,6 +250,60 @@ export function SignupStep({
             {verifyError && !verifying && (
               <p className="mt-2 text-sm text-red-600">{verifyError}</p>
             )}
+          </div>
+
+          <div>
+            <label htmlFor="birthday" className="block text-sm font-medium text-gray-700">
+              Birthday
+            </label>
+            <input
+              id="birthday"
+              type="date"
+              required
+              value={birthday}
+              onChange={(e) => setBirthday(e.target.value)}
+              max={new Date().toISOString().split("T")[0]}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="height" className="block text-sm font-medium text-gray-700">
+              Height
+            </label>
+            <select
+              id="height"
+              required
+              value={heightInches ?? ""}
+              onChange={(e) => setHeightInches(e.target.value ? Number(e.target.value) : null)}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            >
+              <option value="">Select height</option>
+              {Array.from({ length: 37 }, (_, i) => 48 + i).map((inches) => {
+                const ft = Math.floor(inches / 12);
+                const rem = inches % 12;
+                return (
+                  <option key={inches} value={inches}>
+                    {ft}&apos;{rem}&quot;
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+              City
+            </label>
+            <input
+              id="city"
+              type="text"
+              required
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="e.g. New York"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            />
           </div>
 
           {verifying && (

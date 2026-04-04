@@ -2,7 +2,7 @@ import { createServiceClient } from "@kavah/db";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const { communityId, firstName, lastName, phone, clerkUserId, responses } =
+  const { communityId, firstName, lastName, phone, clerkUserId, responses, birthday, heightInches, city } =
     await req.json();
 
   if (!communityId || !firstName || !lastName || !phone || !clerkUserId) {
@@ -49,6 +49,26 @@ export async function POST(req: Request) {
       { error: "Failed to create user" },
       { status: 500 }
     );
+  }
+
+  // Upsert user profile (birthday, height, city)
+  if (birthday || heightInches || city) {
+    const { error: profileError } = await supabase
+      .from("user_profiles")
+      .upsert(
+        {
+          user_id: user.id,
+          birthday: birthday || null,
+          height_inches: heightInches || null,
+          city: city || null,
+        },
+        { onConflict: "user_id" }
+      );
+
+    if (profileError) {
+      console.error("Failed to upsert user profile:", profileError);
+      // Don't fail the whole request — user and membership are more critical
+    }
   }
 
   // Check if membership already exists

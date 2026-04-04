@@ -39,6 +39,9 @@ export function JoinFlow() {
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneVerified, setPhoneVerified] = useState(false);
+  const [birthday, setBirthday] = useState("");
+  const [heightInches, setHeightInches] = useState<number | null>(null);
+  const [city, setCity] = useState("");
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [videoPromptIndex, setVideoPromptIndex] = useState(0);
   const [completing, setCompleting] = useState(false);
@@ -152,6 +155,9 @@ export function JoinFlow() {
           phone: phone.startsWith("+") ? phone : `+1${phone}`,
           clerkUserId,
           responses,
+          birthday,
+          heightInches,
+          city: city.trim(),
         }),
       });
 
@@ -210,6 +216,12 @@ export function JoinFlow() {
           setPhone={setPhone}
           phoneVerified={phoneVerified}
           setPhoneVerified={setPhoneVerified}
+          birthday={birthday}
+          setBirthday={setBirthday}
+          heightInches={heightInches}
+          setHeightInches={setHeightInches}
+          city={city}
+          setCity={setCity}
           onSignUpComplete={handleSignUpComplete}
           onNext={afterWelcome}
         />
