@@ -184,7 +184,7 @@ export function JoinFlow() {
   if (!userLoaded || !signUpLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-500">Loading...</p>
+        <div className="w-6 h-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
       </div>
     );
   }
@@ -267,11 +267,11 @@ export function JoinFlow() {
   // STEP: Complete
   if (step === "complete") {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8">
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
         <div className="max-w-md w-full text-center">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-sage-light flex items-center justify-center">
             <svg
-              className="w-8 h-8 text-green-600"
+              className="w-8 h-8 text-sage"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={2}
@@ -284,21 +284,21 @@ export function JoinFlow() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="font-serif text-2xl font-medium text-ink">
             You&apos;re all set!
           </h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-ink-2">
             Complete your registration to join {community.name}.
           </p>
 
           {completeError && (
-            <p className="mt-4 text-sm text-red-600">{completeError}</p>
+            <p className="mt-4 text-sm text-rose">{completeError}</p>
           )}
 
           <button
             onClick={handleComplete}
             disabled={completing}
-            className="mt-8 w-full rounded-md bg-black px-6 py-3 text-sm font-medium text-white hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-8 w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {completing ? "Completing..." : "Complete"}
           </button>

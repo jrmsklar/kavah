@@ -7,33 +7,25 @@ export function AlreadyJoinedStep() {
   const community = useCommunity();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+    <div className="flex flex-col items-center justify-center min-h-screen px-6 py-12">
       <div className="max-w-md w-full text-center">
-        {community.icon_url ? (
-          <img
-            src={community.icon_url}
-            alt={community.name}
-            className="w-20 h-20 rounded-full mx-auto mb-6 object-cover"
-          />
-        ) : (
-          <div className="w-20 h-20 rounded-full mx-auto mb-6 bg-gray-100 flex items-center justify-center">
-            <span className="text-2xl font-bold text-gray-400">
-              {community.name[0]?.toUpperCase()}
-            </span>
-          </div>
-        )}
+        <div className="w-16 h-16 rounded-full mx-auto mb-6 bg-sage-light flex items-center justify-center">
+          <svg className="w-8 h-8 text-sage" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </div>
 
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="font-serif text-2xl font-medium text-ink">
           Already joined {community.name}
         </h1>
-        <p className="mt-3 text-gray-600">
-          You&apos;re already a member of this community. Head to the home page
-          to see your matches and updates.
+        <p className="mt-3 text-ink-2 leading-relaxed">
+          You&apos;re already a member of this community. Head home to see your
+          matches and updates.
         </p>
 
         <Link
           href="/"
-          className="mt-8 inline-block w-full rounded-md bg-black px-6 py-3 text-sm font-medium text-white hover:bg-gray-800 transition text-center"
+          className="mt-8 inline-block w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm text-center"
         >
           Go to Home
         </Link>

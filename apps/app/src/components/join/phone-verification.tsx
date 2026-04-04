@@ -16,11 +16,11 @@ export function PhoneVerification({
   const [code, setCode] = useState("");
 
   return (
-    <div className="mt-4 p-4 rounded-lg border bg-gray-50">
-      <p className="text-sm text-gray-600 mb-3">
-        We sent a verification code to your phone. Enter it below.
+    <div className="mt-3 rounded-xl border border-gold-light bg-gold-pale/40 p-4">
+      <p className="text-sm text-ink-2">
+        We sent a verification code to your phone.
       </p>
-      <div className="flex gap-2">
+      <div className="mt-3 flex gap-2">
         <input
           type="text"
           inputMode="numeric"
@@ -29,20 +29,20 @@ export function PhoneVerification({
           value={code}
           onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
           placeholder="000000"
-          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-center tracking-widest font-mono shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+          className="flex-1 rounded-lg border border-border bg-warm px-3 py-2.5 text-sm text-center tracking-[0.3em] font-medium focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
         />
         <button
           onClick={() => onVerify(code)}
           disabled={code.length < 6 || loading}
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-lg bg-ink px-5 py-2.5 text-sm font-medium text-white hover:bg-ink/90 transition disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {loading ? "..." : "Verify"}
         </button>
       </div>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-rose">{error}</p>}
       <button
         onClick={onResend}
-        className="mt-2 text-xs text-gray-500 hover:text-gray-700 underline"
+        className="mt-2 text-xs text-ink-3 hover:text-ink-2 underline underline-offset-2"
       >
         Resend code
       </button>

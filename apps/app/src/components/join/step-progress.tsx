@@ -1,65 +1,45 @@
 "use client";
 
-const steps = ["Welcome", "Basics", "Videos"];
+const steps = ["About You", "Basics", "Videos"];
 
 export function StepProgress({ currentStep }: { currentStep: number }) {
   return (
-    <div className="flex items-center justify-center py-6">
+    <div className="flex items-center justify-center gap-2 py-5">
       {steps.map((label, index) => {
         const stepNum = index + 1;
         const isCompleted = stepNum < currentStep;
         const isActive = stepNum === currentStep;
-        const isFuture = stepNum > currentStep;
 
         return (
-          <div key={label} className="flex items-center">
-            {/* Circle */}
-            <div className="flex flex-col items-center">
+          <div key={label} className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors ${
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
                   isCompleted
-                    ? "bg-green-600 border-green-600 text-white"
+                    ? "bg-sage text-white"
                     : isActive
-                      ? "bg-amber-600 border-amber-600 text-white"
-                      : "bg-white border-gray-300 text-gray-400"
+                      ? "bg-gold text-white"
+                      : "bg-border text-ink-3"
                 }`}
               >
                 {isCompleted ? (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2.5}
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4.5 12.75l6 6 9-13.5"
-                    />
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
                 ) : (
                   stepNum
                 )}
               </div>
               <span
-                className={`mt-1 text-xs ${
-                  isActive || isCompleted
-                    ? "text-gray-900 font-medium"
-                    : "text-gray-400"
+                className={`text-xs font-medium ${
+                  isActive ? "text-ink" : isCompleted ? "text-ink-2" : "text-ink-3"
                 }`}
               >
                 {label}
               </span>
             </div>
-
-            {/* Connector line */}
             {index < steps.length - 1 && (
-              <div
-                className={`w-16 h-0.5 mx-1 mb-5 ${
-                  stepNum < currentStep ? "bg-green-600" : "bg-gray-300"
-                }`}
-              />
+              <div className={`w-8 h-px ${isCompleted ? "bg-sage" : "bg-border"}`} />
             )}
           </div>
         );

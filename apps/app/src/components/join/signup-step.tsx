@@ -106,7 +106,6 @@ export function SignupStep({
 
       const phoneStatus = result.verifications?.phoneNumber?.status;
       if (phoneStatus === "verified" || result.status === "complete") {
-        // Capture IDs SYNCHRONOUSLY before any re-render can happen
         const sessionId = result.createdSessionId;
         const userId = result.createdUserId;
 
@@ -142,77 +141,79 @@ export function SignupStep({
     }
   }
 
-  function handleNext() {
-    onNext();
-  }
-
   const canProceed =
     firstName.trim() && lastName.trim() && phoneVerified && birthday && heightInches !== null && city.trim();
 
+  const inputClass =
+    "mt-1.5 block w-full rounded-lg border border-border bg-warm px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold disabled:bg-cream disabled:text-ink-3";
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+    <div className="flex flex-col items-center justify-center min-h-screen px-6 py-12">
       <div className="max-w-md w-full">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="font-serif text-2xl font-medium text-ink">
           {isExistingUser ? "Confirm your info" : "Tell us about yourself"}
         </h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1.5 text-sm text-ink-2">
           {isExistingUser
             ? "We found your account. Confirm your details to continue."
             : "We just need a few basics to get you started."}
         </p>
 
         <div className="mt-8 space-y-5">
-          <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-              First Name
-            </label>
-            <input
-              id="firstName"
-              type="text"
-              required
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              disabled={isExistingUser}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black disabled:bg-gray-50 disabled:text-gray-500"
-            />
+          {/* Name row */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="firstName" className="block text-xs font-medium text-ink-2 uppercase tracking-wide">
+                First Name
+              </label>
+              <input
+                id="firstName"
+                type="text"
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                disabled={isExistingUser}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-xs font-medium text-ink-2 uppercase tracking-wide">
+                Last Name
+              </label>
+              <input
+                id="lastName"
+                type="text"
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                disabled={isExistingUser}
+                className={inputClass}
+              />
+            </div>
           </div>
 
+          {/* Phone */}
           <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-              Last Name
-            </label>
-            <input
-              id="lastName"
-              type="text"
-              required
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              disabled={isExistingUser}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black disabled:bg-gray-50 disabled:text-gray-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="phone" className="block text-xs font-medium text-ink-2 uppercase tracking-wide">
               Phone Number
             </label>
-            <div className="mt-1 flex gap-2">
-              <div className="flex flex-1 rounded-md border border-gray-300 shadow-sm focus-within:border-black focus-within:ring-1 focus-within:ring-black overflow-hidden">
+            <div className="mt-1.5 flex gap-2">
+              <div className="flex flex-1 rounded-lg border border-border bg-warm focus-within:border-gold focus-within:ring-1 focus-within:ring-gold overflow-hidden">
                 <div className="relative flex items-center">
                   <select
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
                     disabled={phoneVerified}
-                    className="appearance-none bg-gray-50 pl-3 pr-7 py-2 text-sm text-gray-700 border-r border-gray-300 focus:outline-none cursor-pointer disabled:cursor-default disabled:text-gray-500"
+                    className="appearance-none bg-cream pl-3 pr-7 py-2.5 text-sm text-ink-2 border-r border-border focus:outline-none cursor-pointer disabled:cursor-default disabled:text-ink-3"
                   >
                     <option value="US">US</option>
                     <option value="CA">CA</option>
                   </select>
-                  <svg className="pointer-events-none absolute right-1.5 w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <svg className="pointer-events-none absolute right-1.5 w-3 h-3 text-ink-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                   </svg>
                 </div>
-                <span className="flex items-center px-2 text-sm text-gray-500 select-none">
+                <span className="flex items-center px-2 text-sm text-ink-3 select-none">
                   +1
                 </span>
                 <input
@@ -227,11 +228,11 @@ export function SignupStep({
                   }}
                   disabled={phoneVerified}
                   placeholder="(555) 000-0000"
-                  className="flex-1 px-2 py-2 text-sm border-0 focus:outline-none focus:ring-0 disabled:bg-gray-50 disabled:text-gray-500"
+                  className="flex-1 px-2 py-2.5 text-sm bg-transparent text-ink placeholder:text-ink-3 border-0 focus:outline-none focus:ring-0 disabled:text-ink-3"
                 />
               </div>
               {phoneVerified ? (
-                <span className="flex items-center gap-1 text-sm text-green-600 font-medium px-3">
+                <span className="flex items-center gap-1.5 text-sm text-sage font-medium px-3">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
@@ -241,14 +242,14 @@ export function SignupStep({
                 <button
                   onClick={handleSendCode}
                   disabled={!canSendCode || sendingCode}
-                  className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-lg bg-ink px-5 py-2.5 text-sm font-medium text-white hover:bg-ink/90 transition disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {sendingCode ? "Sending..." : "Verify"}
                 </button>
               )}
             </div>
             {verifyError && !verifying && (
-              <p className="mt-2 text-sm text-red-600">{verifyError}</p>
+              <p className="mt-2 text-sm text-rose">{verifyError}</p>
             )}
 
             {verifying && (
@@ -261,11 +262,11 @@ export function SignupStep({
             )}
 
             {phoneAlreadyExists && (
-              <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-4">
-                <p className="text-sm font-medium text-red-800">
+              <div className="mt-3 rounded-xl border border-rose-light bg-rose-light/40 p-4">
+                <p className="text-sm font-medium text-rose">
                   This phone number is already associated with an account.
                 </p>
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-1 text-sm text-ink-2">
                   Please sign in with your existing account instead, or use a
                   different phone number.
                 </p>
@@ -274,7 +275,7 @@ export function SignupStep({
                     setPhoneAlreadyExists(false);
                     setPhone("");
                   }}
-                  className="mt-3 text-sm font-medium text-red-700 underline hover:text-red-900"
+                  className="mt-2 text-sm font-medium text-rose underline underline-offset-2 hover:text-rose/80"
                 >
                   Try a different number
                 </button>
@@ -282,8 +283,9 @@ export function SignupStep({
             )}
           </div>
 
+          {/* Birthday */}
           <div>
-            <label htmlFor="birthday" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="birthday" className="block text-xs font-medium text-ink-2 uppercase tracking-wide">
               Birthday
             </label>
             <input
@@ -293,59 +295,61 @@ export function SignupStep({
               value={birthday}
               onChange={(e) => setBirthday(e.target.value)}
               max={new Date().toISOString().split("T")[0]}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+              className={inputClass}
             />
           </div>
 
-          <div>
-            <label htmlFor="height" className="block text-sm font-medium text-gray-700">
-              Height
-            </label>
-            <select
-              id="height"
-              required
-              value={heightInches ?? ""}
-              onChange={(e) => setHeightInches(e.target.value ? Number(e.target.value) : null)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-            >
-              <option value="">Select height</option>
-              {Array.from({ length: 37 }, (_, i) => 48 + i).map((inches) => {
-                const ft = Math.floor(inches / 12);
-                const rem = inches % 12;
-                return (
-                  <option key={inches} value={inches}>
-                    {ft}&apos;{rem}&quot;
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-              City
-            </label>
-            <select
-              id="city"
-              required
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-            >
-              <option value="">Select city</option>
-              <option value="New York, NY">New York, NY</option>
-              <option value="Los Angeles, CA">Los Angeles, CA</option>
-              <option value="Miami, FL">Miami, FL</option>
-            </select>
+          {/* Height & City row */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="height" className="block text-xs font-medium text-ink-2 uppercase tracking-wide">
+                Height
+              </label>
+              <select
+                id="height"
+                required
+                value={heightInches ?? ""}
+                onChange={(e) => setHeightInches(e.target.value ? Number(e.target.value) : null)}
+                className={inputClass}
+              >
+                <option value="">Select</option>
+                {Array.from({ length: 37 }, (_, i) => 48 + i).map((inches) => {
+                  const ft = Math.floor(inches / 12);
+                  const rem = inches % 12;
+                  return (
+                    <option key={inches} value={inches}>
+                      {ft}&apos;{rem}&quot;
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="city" className="block text-xs font-medium text-ink-2 uppercase tracking-wide">
+                City
+              </label>
+              <select
+                id="city"
+                required
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className={inputClass}
+              >
+                <option value="">Select</option>
+                <option value="New York, NY">New York, NY</option>
+                <option value="Los Angeles, CA">Los Angeles, CA</option>
+                <option value="Miami, FL">Miami, FL</option>
+              </select>
+            </div>
           </div>
         </div>
 
         <div id="clerk-captcha" />
 
         <button
-          onClick={handleNext}
+          onClick={onNext}
           disabled={!canProceed}
-          className="mt-8 w-full rounded-md bg-black px-6 py-3 text-sm font-medium text-white hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-8 w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Next
         </button>

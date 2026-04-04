@@ -46,7 +46,6 @@ export function VideoStep({
   const [error, setError] = useState("");
   const [uploadProgress, setUploadProgress] = useState("");
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopStream();
@@ -55,7 +54,6 @@ export function VideoStep({
     };
   }, []);
 
-  // Reset state when prompt changes
   useEffect(() => {
     stopStream();
     if (timerRef.current) clearInterval(timerRef.current);
@@ -113,11 +111,10 @@ export function VideoStep({
       setState("review");
     };
 
-    recorder.start(1000); // collect data every second
+    recorder.start(1000);
     mediaRecorderRef.current = recorder;
     setState("recording");
 
-    // Timer
     timerRef.current = setInterval(() => {
       setElapsed((prev) => prev + 1);
     }, 1000);
@@ -179,40 +176,40 @@ export function VideoStep({
   const canProceed = state === "done" || !!existingResponse;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <StepProgress currentStep={3} />
 
-      <div className="max-w-2xl mx-auto px-4 pb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mt-4">
+      <div className="max-w-lg mx-auto px-5 pb-10">
+        {/* Prompt badge */}
+        <div className="flex items-center gap-2 mt-2">
+          <span className="rounded-full bg-gold-pale border border-gold-light px-3 py-1 text-xs font-medium text-gold">
+            Prompt {currentIndex + 1} of {totalCount}
+          </span>
+        </div>
+
+        {/* Question */}
+        <h1 className="font-serif text-xl font-medium text-ink mt-4 leading-relaxed">
           {prompt.label}
         </h1>
 
         {/* Video area */}
-        <div className="mt-6 rounded-xl overflow-hidden bg-black aspect-video relative">
-          {/* Idle state */}
+        <div className="mt-5 rounded-2xl overflow-hidden bg-ink aspect-video relative shadow-sm">
           {state === "idle" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1}
-                stroke="currentColor"
-                className="w-12 h-12 text-gray-500"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"
-                />
-              </svg>
-              <p className="text-gray-500 text-sm mt-2">
-                Click below to start your camera
+            <button
+              onClick={startCamera}
+              className="absolute inset-0 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition group"
+            >
+              <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition">
+                <svg className="w-7 h-7 text-white/70" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+              </div>
+              <p className="text-white/50 text-sm font-medium">
+                Tap to start camera
               </p>
-            </div>
+            </button>
           )}
 
-          {/* Live preview */}
           {(state === "preview" || state === "recording") && (
             <video
               ref={(el) => {
@@ -229,17 +226,15 @@ export function VideoStep({
             />
           )}
 
-          {/* Recording indicator */}
           {state === "recording" && (
-            <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/60 rounded-full px-3 py-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-white text-sm font-mono">
+            <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-rose animate-pulse" />
+              <span className="text-white text-xs font-medium tabular-nums">
                 {formatTime(elapsed)}
               </span>
             </div>
           )}
 
-          {/* Playback review */}
           {state === "review" && recordedUrl && (
             <video
               ref={playbackRef}
@@ -250,54 +245,32 @@ export function VideoStep({
             />
           )}
 
-          {/* Uploading */}
           {state === "uploading" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <p className="text-white text-sm mt-3">{uploadProgress}</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <p className="text-white/60 text-sm">{uploadProgress}</p>
             </div>
           )}
 
-          {/* Done */}
           {state === "done" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"
-                  />
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+              <div className="w-14 h-14 rounded-full bg-sage/20 flex items-center justify-center">
+                <svg className="w-7 h-7 text-sage" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               </div>
-              <p className="text-green-400 text-sm mt-3 font-medium">
-                Video recorded
-              </p>
+              <p className="text-sage text-sm font-medium">Video recorded</p>
             </div>
           )}
         </div>
 
-        {/* Action buttons based on state */}
-        {state === "idle" && (
-          <button
-            onClick={startCamera}
-            className="mt-4 w-full rounded-md bg-gray-900 px-6 py-3 text-sm font-medium text-white hover:bg-gray-800 transition"
-          >
-            Start camera
-          </button>
-        )}
-
+        {/* Action buttons */}
         {state === "preview" && (
           <button
             onClick={startRecording}
-            className="mt-4 w-full rounded-md bg-red-600 px-6 py-3 text-sm font-medium text-white hover:bg-red-700 transition"
+            className="mt-4 w-full rounded-xl bg-rose px-6 py-3 text-sm font-semibold text-white hover:bg-rose/90 transition flex items-center justify-center gap-2"
           >
+            <div className="w-2.5 h-2.5 rounded-full bg-white" />
             Record
           </button>
         )}
@@ -305,9 +278,9 @@ export function VideoStep({
         {state === "recording" && (
           <button
             onClick={stopRecording}
-            className="mt-4 w-full rounded-md bg-red-600 px-6 py-3 text-sm font-medium text-white hover:bg-red-700 transition flex items-center justify-center gap-2"
+            className="mt-4 w-full rounded-xl bg-rose px-6 py-3 text-sm font-semibold text-white hover:bg-rose/90 transition flex items-center justify-center gap-2"
           >
-            <div className="w-3 h-3 rounded-sm bg-white" />
+            <div className="w-2.5 h-2.5 rounded-sm bg-white" />
             Stop recording
           </button>
         )}
@@ -316,13 +289,13 @@ export function VideoStep({
           <div className="mt-4 flex gap-3">
             <button
               onClick={handleReRecord}
-              className="flex-1 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+              className="flex-1 rounded-xl border border-border bg-warm px-4 py-3 text-sm font-medium text-ink-2 hover:bg-cream transition"
             >
               Re-record
             </button>
             <button
               onClick={handleUseVideo}
-              className="flex-1 rounded-md bg-green-600 px-4 py-3 text-sm font-medium text-white hover:bg-green-700 transition"
+              className="flex-1 rounded-xl bg-sage px-4 py-3 text-sm font-semibold text-white hover:bg-sage/90 transition"
             >
               Use this video
             </button>
@@ -332,28 +305,28 @@ export function VideoStep({
         {state === "done" && !existingResponse && (
           <button
             onClick={handleReRecord}
-            className="mt-4 w-full rounded-md border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+            className="mt-4 w-full rounded-xl border border-border bg-warm px-6 py-3 text-sm font-medium text-ink-2 hover:bg-cream transition"
           >
             Re-record
           </button>
         )}
 
-        {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-3 text-sm text-rose">{error}</p>}
 
         {/* Navigation */}
         <div className="mt-6 flex gap-3">
           <button
             onClick={onBack}
-            className="rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+            className="rounded-xl border border-border bg-warm px-5 py-3 text-sm font-medium text-ink-2 hover:bg-cream transition"
           >
             Back
           </button>
           <button
             onClick={onNext}
             disabled={!canProceed}
-            className="flex-1 rounded-md bg-amber-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-amber-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 rounded-xl bg-ink px-6 py-3 text-sm font-semibold text-white hover:bg-ink/90 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {isLast ? "Finish" : "Next prompt \u2192"}
+            {isLast ? "Finish" : "Next prompt"}
           </button>
         </div>
       </div>
