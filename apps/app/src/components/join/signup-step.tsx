@@ -250,6 +250,36 @@ export function SignupStep({
             {verifyError && !verifying && (
               <p className="mt-2 text-sm text-red-600">{verifyError}</p>
             )}
+
+            {verifying && (
+              <PhoneVerification
+                onVerify={handleVerifyCode}
+                onResend={handleResendCode}
+                error={verifyError}
+                loading={verifyLoading}
+              />
+            )}
+
+            {phoneAlreadyExists && (
+              <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-4">
+                <p className="text-sm font-medium text-red-800">
+                  This phone number is already associated with an account.
+                </p>
+                <p className="mt-1 text-sm text-red-600">
+                  Please sign in with your existing account instead, or use a
+                  different phone number.
+                </p>
+                <button
+                  onClick={() => {
+                    setPhoneAlreadyExists(false);
+                    setPhone("");
+                  }}
+                  className="mt-3 text-sm font-medium text-red-700 underline hover:text-red-900"
+                >
+                  Try a different number
+                </button>
+              </div>
+            )}
           </div>
 
           <div>
@@ -295,46 +325,19 @@ export function SignupStep({
             <label htmlFor="city" className="block text-sm font-medium text-gray-700">
               City
             </label>
-            <input
+            <select
               id="city"
-              type="text"
               required
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              placeholder="e.g. New York"
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-            />
+            >
+              <option value="">Select city</option>
+              <option value="New York, NY">New York, NY</option>
+              <option value="Los Angeles, CA">Los Angeles, CA</option>
+              <option value="Miami, FL">Miami, FL</option>
+            </select>
           </div>
-
-          {verifying && (
-            <PhoneVerification
-              onVerify={handleVerifyCode}
-              onResend={handleResendCode}
-              error={verifyError}
-              loading={verifyLoading}
-            />
-          )}
-
-          {phoneAlreadyExists && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-              <p className="text-sm font-medium text-red-800">
-                This phone number is already associated with an account.
-              </p>
-              <p className="mt-1 text-sm text-red-600">
-                Please sign in with your existing account instead, or use a
-                different phone number.
-              </p>
-              <button
-                onClick={() => {
-                  setPhoneAlreadyExists(false);
-                  setPhone("");
-                }}
-                className="mt-3 text-sm font-medium text-red-700 underline hover:text-red-900"
-              >
-                Try a different number
-              </button>
-            </div>
-          )}
         </div>
 
         <div id="clerk-captcha" />
