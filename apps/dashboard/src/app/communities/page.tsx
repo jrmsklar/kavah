@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { getOwnedCommunities } from "@kavah/db";
+import { getManagedCommunities } from "@kavah/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -7,7 +7,7 @@ export default async function CommunitiesPage() {
   const { userId: clerkId } = await auth();
   if (!clerkId) redirect("/sign-in");
 
-  const communities = await getOwnedCommunities(clerkId);
+  const communities = await getManagedCommunities(clerkId);
 
   if (communities.length === 0) {
     return (

@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { getOwnedCommunities } from "@kavah/db";
+import { getManagedCommunities } from "@kavah/db";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -8,6 +8,6 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const communities = await getOwnedCommunities(clerkId);
+  const communities = await getManagedCommunities(clerkId);
   return NextResponse.json({ communities });
 }

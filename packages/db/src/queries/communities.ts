@@ -1,6 +1,9 @@
 import { createServiceClient } from "../client";
 
-export async function getOwnedCommunities(clerkId: string) {
+/**
+ * Get communities where the user is an owner or admin.
+ */
+export async function getManagedCommunities(clerkId: string) {
   const supabase = createServiceClient();
 
   const { data: user } = await supabase
@@ -13,9 +16,9 @@ export async function getOwnedCommunities(clerkId: string) {
 
   const { data: memberships } = await supabase
     .from("memberships")
-    .select("community_id")
+    .select("community_id, role")
     .eq("user_id", user.id)
-    .eq("role", "owner");
+    .in("role", ["owner", "admin"]);
 
   const communityIds = memberships?.map((m) => m.community_id) ?? [];
   if (communityIds.length === 0) return [];

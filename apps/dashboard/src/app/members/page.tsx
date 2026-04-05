@@ -26,7 +26,7 @@ export default function MembersPage() {
 
   // Fetch owned communities
   useEffect(() => {
-    fetch("/api/communities/owned")
+    fetch("/api/communities/managed")
       .then((r) => r.json())
       .then((data) => {
         setCommunities(data.communities ?? []);
