@@ -32,15 +32,15 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const { data: ownership } = await supabase
+  const { data: callerMembership } = await supabase
     .from("memberships")
     .select("id")
     .eq("user_id", callerUser.id)
     .eq("community_id", communityId)
-    .eq("role", "owner")
+    .in("role", ["owner", "admin"])
     .single();
 
-  if (!ownership) {
+  if (!callerMembership) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
