@@ -1,7 +1,35 @@
+import type { Metadata } from "next";
 import { createServiceClient } from "@kavah/db";
 import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 import { CommunityProvider } from "./community-context";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ community_slug: string }>;
+}): Promise<Metadata> {
+  const { community_slug } = await params;
+  const supabase = createServiceClient();
+
+  const { data: community } = await supabase
+    .from("communities")
+    .select("name, icon_url")
+    .eq("slug", community_slug)
+    .single();
+
+  if (!community) return { title: "Kavah" };
+
+  return {
+    title: `Kavah | ${community.name}`,
+    openGraph: {
+      title: `Kavah | ${community.name}`,
+      ...(community.icon_url
+        ? { images: [{ url: community.icon_url }] }
+        : {}),
+    },
+  };
+}
 
 export default async function JoinLayout({
   params,
