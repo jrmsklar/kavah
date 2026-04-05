@@ -1,5 +1,6 @@
 import { createServiceClient } from "@kavah/db";
 import { NextResponse } from "next/server";
+import { sendNotificationEmail } from "@/lib/notifications";
 
 export async function POST(req: Request) {
   const { communityId, firstName, lastName, phone, clerkUserId, responses, birthday, heightInches, city } =
@@ -97,6 +98,11 @@ export async function POST(req: Request) {
     }
   }
 
+  // Notify admins via email (fire-and-forget)
+  if (!existing) {
+    notifyAdmins(communityId, firstName, lastName, supabase);
+  }
+
   // Save responses if provided
   if (responses && typeof responses === "object") {
     const responseEntries = Object.entries(responses as Record<string, string>);
@@ -124,4 +130,29 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ success: true }, { status: 201 });
+}
+
+/**
+ * Fire-and-forget: email admins when a new member joins.
+ */
+async function notifyAdmins(
+  communityId: string,
+  memberFirstName: string,
+  memberLastName: string,
+  supabase: ReturnType<typeof createServiceClient>,
+) {
+  try {
+    const { data: community } = await supabase
+      .from("communities")
+      .select("name")
+      .eq("id", communityId)
+      .single();
+
+    if (!community) return;
+
+    const subject = `${memberFirstName} ${memberLastName} joined ${community.name}`;
+    await sendNotificationEmail(subject, subject);
+  } catch (error) {
+    console.error("Failed to notify admins:", error);
+  }
 }
