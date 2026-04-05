@@ -20,7 +20,7 @@ async function verifyOwnership(clerkId: string, communityId: string) {
     .select("id")
     .eq("user_id", user.id)
     .eq("community_id", communityId)
-    .eq("role", "owner")
+    .in("role", ["owner", "admin"])
     .single();
 
   return membership ? user : null;
