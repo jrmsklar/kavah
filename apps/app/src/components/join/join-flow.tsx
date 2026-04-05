@@ -369,8 +369,7 @@ export function JoinFlow() {
             </p>
 
             <p className="mt-4 text-ink-3 italic leading-relaxed">
-              No algorithm. No swiping. Just a real introduction when the time is
-              right.
+              No swiping. Just a real introduction when the time is right.
             </p>
 
             <div className="mt-6">

@@ -235,8 +235,7 @@ export default function Home() {
             Ready to be seen for who you actually are?
           </h2>
           <p className="mt-4 text-ink-2 max-w-md mx-auto">
-            No algorithm. No swiping. Just a real introduction when the time is
-            right.
+            No swiping. Just a real introduction when the time is right.
           </p>
           <Link
             href="https://app.joinkavah.com"
