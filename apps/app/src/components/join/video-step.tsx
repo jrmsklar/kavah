@@ -425,6 +425,16 @@ export function VideoStep({
 
         {error && <p className="mt-3 text-sm text-rose">{error}</p>}
 
+        {/* Privacy disclaimer */}
+        <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 flex items-center gap-3">
+          <svg className="w-5 h-5 flex-shrink-0 text-blue-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
+          <p className="text-sm text-ink-2 leading-snug">
+            Your videos are <span className="font-semibold text-ink">only visible to your matchmaker</span> and are never shared publicly.
+          </p>
+        </div>
+
         {/* Navigation */}
         <div className="mt-6 flex gap-3">
           <button
