@@ -30,15 +30,15 @@ export default function Home() {
             <span className="italic text-gold">Not what you do.</span>
           </h1>
           <p className="mt-5 text-lg text-ink-2 max-w-lg mx-auto leading-relaxed">
-            Three short video prompts. No filter, no script — just you, the way
-            you&apos;d show up at a Friday night table.
+            Just answer four short video prompts &ndash; no filter, no
+            script &ndash; and we&apos;ll take care of the rest.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="https://app.joinkavah.com"
               className="rounded-xl bg-ink px-8 py-3.5 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm"
             >
-              Get Started
+              Get started
             </Link>
             <a
               href="#how-it-works"
@@ -134,7 +134,7 @@ export default function Home() {
                 Record
               </h3>
               <p className="mt-2 text-sm text-ink-2 leading-relaxed">
-                Answer three short video prompts. 30 seconds each. No script,
+                Answer four short video prompts. 90 seconds each. No script,
                 just you.
               </p>
             </div>
@@ -242,7 +242,7 @@ export default function Home() {
             href="https://app.joinkavah.com"
             className="mt-8 inline-block rounded-xl bg-ink px-8 py-3.5 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm"
           >
-            Get Started
+            Get started
           </Link>
         </section>
       </main>
