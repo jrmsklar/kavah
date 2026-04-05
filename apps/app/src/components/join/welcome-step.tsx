@@ -59,9 +59,16 @@ export function WelcomeStep({ onNext }: { onNext: () => void }) {
           </div>
         </div>
 
+        <p className="mt-8 flex items-center justify-center gap-1.5 text-xs text-ink-3">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
+          Your responses are only seen by your matchmaker
+        </p>
+
         <button
           onClick={onNext}
-          className="mt-8 w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm"
+          className="mt-3 w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm"
         >
           Get Set Up
         </button>
