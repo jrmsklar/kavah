@@ -347,9 +347,11 @@ export function SignupStep({
                 className={inputClass}
               >
                 <option value="">Select</option>
-                <option value="New York, NY">New York, NY</option>
+                <option value="Boston, MA">Boston, MA</option>
                 <option value="Los Angeles, CA">Los Angeles, CA</option>
                 <option value="Miami, FL">Miami, FL</option>
+                <option value="New York, NY">New York, NY</option>
+                <option value="San Francisco, CA">San Francisco, CA</option>
               </select>
             </div>
           </div>
