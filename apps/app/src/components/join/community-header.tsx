@@ -15,15 +15,7 @@ export function CommunityHeader() {
             className="h-14 mx-auto mb-3"
           />
         ) : (
-          <div className="w-14 h-14 rounded-xl mx-auto mb-3 bg-gold-pale flex items-center justify-center shadow-sm">
-            <span className="text-lg font-semibold text-gold">
-              {community.name[0]?.toUpperCase()}
-            </span>
-          </div>
-        )}
-
-        {!community.icon_url && (
-          <h2 className="font-serif text-xl font-medium text-ink">
+          <h2 className="font-serif text-2xl font-semibold text-ink mb-3">
             {community.name}
           </h2>
         )}
