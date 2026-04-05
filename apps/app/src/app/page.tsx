@@ -1,78 +1,44 @@
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import Link from "next/link";
 
 export default function App() {
   return (
     <>
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-cream/80 backdrop-blur-md border-b border-border-subtle">
-        <div className="max-w-5xl mx-auto flex items-center justify-between px-6 py-3.5">
-          <SignedOut>
+      {/* Navbar (signed in only) */}
+      <SignedIn>
+        <nav className="sticky top-0 z-50 bg-cream/80 backdrop-blur-md border-b border-border-subtle">
+          <div className="max-w-5xl mx-auto flex items-center justify-between px-6 py-3.5">
             <div />
-          </SignedOut>
-          <SignedIn>
-            <span className="text-sm font-medium text-ink-3">My Community</span>
-          </SignedIn>
-
-          <span className="font-serif text-xl font-medium text-ink">kavah</span>
-
-          <div className="flex items-center gap-3">
-            <SignedOut>
-              <SignInButton mode="redirect">
-                <button className="text-sm font-medium text-ink-2 hover:text-ink transition">
-                  Log In
-                </button>
-              </SignInButton>
-              <SignUpButton mode="redirect">
-                <button className="rounded-lg bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90 transition">
-                  Sign Up
-                </button>
-              </SignUpButton>
-            </SignedOut>
-            <SignedIn>
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: "w-8 h-8",
-                  },
-                }}
-              />
-            </SignedIn>
+            <span className="font-serif text-xl font-medium text-ink">kavah</span>
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "w-8 h-8",
+                },
+              }}
+            />
           </div>
-        </div>
-      </nav>
+        </nav>
+      </SignedIn>
 
       <main className="max-w-5xl mx-auto px-6">
-        {/* Signed out hero */}
+        {/* Signed out */}
         <SignedOut>
           <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] text-center">
-            <p className="text-sm font-medium text-gold uppercase tracking-widest">
-              Community Matchmaking
+            <p className="text-sm text-ink-2">
+              You must log in to continue.
             </p>
-            <h1 className="mt-3 font-serif text-4xl md:text-5xl font-medium text-ink leading-tight max-w-lg">
-              Matching people at the level of who they actually are.
-            </h1>
-            <p className="mt-4 text-ink-2 max-w-md leading-relaxed">
-              No swiping. No algorithms. Just real introductions from people who
-              know you, powered by what you actually say and how you show up.
-            </p>
-            <div className="mt-8 flex gap-3">
-              <SignUpButton mode="redirect">
-                <button className="rounded-xl bg-ink px-6 py-3 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm">
-                  Get Started
-                </button>
-              </SignUpButton>
-              <SignInButton mode="redirect">
-                <button className="rounded-xl border border-border bg-warm px-6 py-3 text-sm font-medium text-ink-2 hover:bg-cream transition">
-                  Log In
-                </button>
-              </SignInButton>
-            </div>
+            <SignInButton mode="redirect">
+              <button className="mt-6 rounded-xl bg-ink px-8 py-3 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm">
+                Log In
+              </button>
+            </SignInButton>
+            <Link
+              href="https://joinkavah.com"
+              className="mt-4 text-sm text-ink-3 hover:text-ink-2 transition underline underline-offset-2"
+            >
+              Learn more about Kavah
+            </Link>
           </div>
         </SignedOut>
 
