@@ -14,6 +14,7 @@
     "@kavah/db": "workspace:*",
     "@kavah/ui": "workspace:*",
     "next": "^15",
+    "posthog-js": "^1.364.7",
     "react": "^19",
     "react-dom": "^19"
   },
