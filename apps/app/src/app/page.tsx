@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 
 export default function App() {
@@ -24,18 +24,13 @@ export default function App() {
       <main className="max-w-5xl mx-auto px-6">
         {/* Signed out */}
         <SignedOut>
-          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] text-center">
-            <p className="text-sm text-ink-2">
-              You must log in to continue.
+          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] text-center px-6">
+            <p className="text-sm text-ink-2 max-w-xs leading-relaxed">
+              To get started, reach out to your community owner for your unique sign-up link.
             </p>
-            <SignInButton mode="redirect">
-              <button className="mt-6 rounded-xl bg-ink px-8 py-3 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm">
-                Log In
-              </button>
-            </SignInButton>
             <Link
               href="https://joinkavah.com"
-              className="mt-4 text-sm text-ink-3 hover:text-ink-2 transition underline underline-offset-2"
+              className="mt-6 rounded-xl border border-border bg-warm px-6 py-3 text-sm font-medium text-ink-2 hover:bg-cream transition"
             >
               Learn more about Kavah
             </Link>
