@@ -30,6 +30,35 @@ function PoweredByKavah() {
   );
 }
 
+function ReferButton({ communitySlug }: { communitySlug: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    const link = `${window.location.origin}/join/${communitySlug}`;
+    await navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="mt-3 w-full rounded-xl bg-ink px-6 py-3 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm"
+    >
+      {copied ? (
+        <span className="flex items-center justify-center gap-2">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          Link copied!
+        </span>
+      ) : (
+        "Share with a friend"
+      )}
+    </button>
+  );
+}
+
 const stepNumber: Record<Step, number> = {
   landing: 0,
   welcome: 1,
@@ -343,7 +372,7 @@ export function JoinFlow() {
     return (
       <div className="min-h-screen flex flex-col px-6 py-12">
         <div className="flex-1 flex items-center justify-center">
-          <div className="max-w-md w-full rounded-2xl border border-border bg-warm p-10 text-center">
+          <div className="max-w-md w-full text-center">
             {community.icon_url && (
               <img
                 src={community.icon_url}
@@ -379,9 +408,16 @@ export function JoinFlow() {
               </p>
             </div>
 
+            <div className="mt-8 rounded-2xl border border-border bg-warm p-6">
+              <p className="text-sm text-ink-2 leading-relaxed">
+                Know someone great? Invite them to join {community.name} on Kavah.
+              </p>
+              <ReferButton communitySlug={community.slug} />
+            </div>
+
             <button
               onClick={() => router.push("/")}
-              className="mt-8 w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-white hover:bg-ink/90 transition shadow-sm"
+              className="mt-4 text-sm text-ink-3 hover:text-ink-2 transition"
             >
               Done
             </button>
