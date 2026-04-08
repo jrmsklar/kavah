@@ -86,7 +86,7 @@ export default async function CommunityDetailPage({
     <div className="p-8">
       <Link
         href="/communities"
-        className="text-sm text-gray-500 hover:text-gray-700 transition"
+        className="text-sm text-ink-3 hover:text-ink-2 transition"
       >
         &larr; Back to communities
       </Link>
@@ -99,17 +99,17 @@ export default async function CommunityDetailPage({
             className="h-14 mb-4"
           />
         )}
-        <h1 className="text-3xl font-bold text-gray-900">{community.name}</h1>
+        <h1 className="font-serif text-3xl font-medium text-ink">{community.name}</h1>
         {community.description && (
-          <p className="mt-1 text-gray-600">{community.description}</p>
+          <p className="mt-1 text-ink-2">{community.description}</p>
         )}
         <div className="mt-3 flex items-center gap-3">
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-ink-3">
             Created {new Date(community.created_at).toLocaleDateString()}
           </p>
           <Link
             href={`/communities/${slug}/settings`}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition"
+            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-ink-2 hover:bg-cream transition"
           >
             Settings
           </Link>
@@ -118,24 +118,24 @@ export default async function CommunityDetailPage({
 
       {/* Stats */}
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border p-4">
-          <p className="text-sm text-gray-500">Members</p>
-          <p className="mt-1 text-2xl font-semibold text-gray-900">
+        <div className="rounded-xl border border-border bg-warm p-5">
+          <p className="text-sm text-ink-3">Members</p>
+          <p className="mt-1 text-2xl font-semibold text-ink">
             {memberCount ?? 0}
           </p>
         </div>
       </div>
 
       {/* Share link */}
-      <div className="mt-8 rounded-lg border p-6">
-        <h2 className="text-lg font-semibold text-gray-900">
+      <div className="mt-8 rounded-xl border border-border bg-warm p-6">
+        <h2 className="font-serif text-lg font-medium text-ink">
           Invite members
         </h2>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-ink-2">
           Share this link with friends to invite them to your community.
         </p>
         <div className="mt-4 flex items-center gap-3">
-          <div className="flex-1 rounded-md border bg-gray-50 px-3 py-2 text-sm text-gray-700 font-mono truncate">
+          <div className="flex-1 rounded-lg border border-border-subtle bg-cream px-3 py-2 text-sm text-ink-2 font-mono truncate">
             {joinLink}
           </div>
           <CopyLinkButton link={joinLink} />
@@ -143,13 +143,13 @@ export default async function CommunityDetailPage({
       </div>
 
       {/* Prompts */}
-      <div className="mt-8 rounded-lg border p-6">
+      <div className="mt-8 rounded-xl border border-border bg-warm p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Prompts</h2>
+          <h2 className="font-serif text-lg font-medium text-ink">Prompts</h2>
           {sectionCount > 0 && (
             <Link
               href={`/communities/${slug}/prompts`}
-              className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition"
+              className="rounded-xl bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-ink/90 transition"
             >
               Edit Prompts
             </Link>
@@ -158,14 +158,14 @@ export default async function CommunityDetailPage({
 
         {sectionCount === 0 ? (
           <>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-ink-2">
               Set up the questions members will answer when joining your
               community. You can add text fields, multiple choice, video
               prompts, and more.
             </p>
             <Link
               href={`/communities/${slug}/prompts`}
-              className="mt-4 inline-block rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition"
+              className="mt-4 inline-block rounded-xl bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-ink/90 transition"
             >
               Add Prompts
             </Link>
@@ -175,17 +175,17 @@ export default async function CommunityDetailPage({
             {promptSections!.map((section) => {
               const sectionPrompts = promptsBySection.get(section.id) ?? [];
               return (
-                <div key={section.id} className="rounded-lg border bg-gray-50 p-4">
+                <div key={section.id} className="rounded-xl border border-border-subtle bg-cream p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-sm font-semibold text-gray-900">
+                    <h3 className="text-sm font-semibold text-ink">
                       {section.title || "Untitled Section"}
                     </h3>
-                    <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600">
+                    <span className="rounded-full bg-gold-pale px-2 py-0.5 text-xs text-gold font-medium">
                       {section.step}
                     </span>
                   </div>
                   {sectionPrompts.length === 0 ? (
-                    <p className="text-xs text-gray-400">No prompts in this section</p>
+                    <p className="text-xs text-ink-3">No prompts in this section</p>
                   ) : (
                     <ul className="space-y-2">
                       {sectionPrompts.map((prompt) => {
@@ -195,18 +195,18 @@ export default async function CommunityDetailPage({
                         return (
                           <li
                             key={prompt.id}
-                            className="rounded border bg-white p-3"
+                            className="rounded-lg border border-border-subtle bg-warm p-3"
                           >
                             <div className="flex items-center justify-between">
-                              <span className="text-sm text-gray-900">
+                              <span className="text-sm text-ink">
                                 {prompt.label || "Untitled Prompt"}
                               </span>
                               <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-ink-3">
                                   {PROMPT_TYPE_LABELS[prompt.type as PromptType] ?? prompt.type}
                                 </span>
                                 {prompt.required && (
-                                  <span className="text-xs text-red-500">Required</span>
+                                  <span className="text-xs text-rose font-medium">Required</span>
                                 )}
                               </div>
                             </div>
@@ -215,7 +215,7 @@ export default async function CommunityDetailPage({
                                 {options.map((opt) => (
                                   <span
                                     key={opt.id}
-                                    className="rounded-full border bg-gray-50 px-2.5 py-0.5 text-xs text-gray-600"
+                                    className="rounded-full border border-border-subtle bg-cream px-2.5 py-0.5 text-xs text-ink-2"
                                   >
                                     {opt.label}
                                   </span>
@@ -230,7 +230,7 @@ export default async function CommunityDetailPage({
                 </div>
               );
             })}
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-ink-3">
               {sectionCount} {sectionCount === 1 ? "section" : "sections"},{" "}
               {promptCount} {promptCount === 1 ? "prompt" : "prompts"}
             </p>

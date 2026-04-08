@@ -117,15 +117,15 @@ export default function NewCommunityPage() {
       <div className="w-full max-w-lg">
         <Link
           href="/communities"
-          className="text-sm text-gray-500 hover:text-gray-700 transition"
+          className="text-sm text-ink-3 hover:text-ink-2 transition"
         >
           &larr; Back to communities
         </Link>
 
-        <h1 className="mt-4 text-2xl font-bold text-gray-900">
+        <h1 className="mt-4 font-serif text-2xl font-medium text-ink">
           Create a new community
         </h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-ink-2">
           Give your community a name and optional description. You can always
           change these later.
         </p>
@@ -133,9 +133,9 @@ export default function NewCommunityPage() {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           {/* Logo upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-ink">
               Logo{" "}
-              <span className="text-gray-400 font-normal">(optional)</span>
+              <span className="text-ink-3 font-normal">(optional)</span>
             </label>
             <div className="mt-2">
               {logoPreview ? (
@@ -143,16 +143,16 @@ export default function NewCommunityPage() {
                   <img
                     src={logoPreview}
                     alt="Logo preview"
-                    className="w-16 h-16 rounded-xl object-cover border border-gray-200"
+                    className="w-16 h-16 rounded-xl object-cover border border-border"
                   />
                   <div className="flex flex-col gap-1">
-                    <p className="text-sm text-gray-600 truncate max-w-[200px]">
+                    <p className="text-sm text-ink-2 truncate max-w-[200px]">
                       {logoFile?.name}
                     </p>
                     <button
                       type="button"
                       onClick={removeLogo}
-                      className="text-sm text-red-600 hover:text-red-700 transition text-left"
+                      className="text-sm text-rose hover:text-rose/80 transition text-left"
                     >
                       Remove
                     </button>
@@ -166,16 +166,16 @@ export default function NewCommunityPage() {
                   onDragLeave={handleDragLeave}
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
-                  className={`flex items-center gap-3 w-full rounded-lg border border-dashed px-4 py-4 transition ${
+                  className={`flex items-center gap-3 w-full rounded-xl border border-dashed px-4 py-4 transition ${
                     isDragging
-                      ? "border-black bg-gray-100 ring-2 ring-black/10"
-                      : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                      ? "border-gold bg-gold-pale ring-2 ring-gold/20"
+                      : "border-border hover:border-ink-3/30 hover:bg-cream"
                   }`}
                 >
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition ${
-                    isDragging ? "bg-gray-200" : "bg-gray-100"
+                    isDragging ? "bg-gold-light" : "bg-cream"
                   }`}>
-                    <svg className={`w-6 h-6 transition ${isDragging ? "text-gray-600" : "text-gray-400"}`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <svg className={`w-6 h-6 transition ${isDragging ? "text-gold" : "text-ink-3"}`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       {isDragging ? (
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
                       ) : (
@@ -184,11 +184,11 @@ export default function NewCommunityPage() {
                     </svg>
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-gray-700">
+                    <p className="text-sm font-medium text-ink">
                       {isDragging ? "Drop image to upload" : "Upload a logo"}
                     </p>
                     {!isDragging && (
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-ink-3">
                         PNG, JPEG, WebP, SVG, or GIF. Max 2 MB.
                       </p>
                     )}
@@ -208,7 +208,7 @@ export default function NewCommunityPage() {
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-ink"
             >
               Community name
             </label>
@@ -219,17 +219,17 @@ export default function NewCommunityPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Friday Tables"
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+              className="mt-1 block w-full rounded-lg border border-border bg-warm px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
             />
           </div>
 
           <div>
             <label
               htmlFor="matchmakerName"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-ink"
             >
               Matchmaker name(s){" "}
-              <span className="text-gray-400 font-normal">(optional)</span>
+              <span className="text-ink-3 font-normal">(optional)</span>
             </label>
             <input
               id="matchmakerName"
@@ -237,9 +237,9 @@ export default function NewCommunityPage() {
               value={matchmakerName}
               onChange={(e) => setMatchmakerName(e.target.value)}
               placeholder="e.g. Danielle and Justin"
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+              className="mt-1 block w-full rounded-lg border border-border bg-warm px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
             />
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-ink-3">
               Shown to members on the join page as who&apos;s doing the matching.
             </p>
           </div>
@@ -247,10 +247,10 @@ export default function NewCommunityPage() {
           <div>
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-ink"
             >
               Description{" "}
-              <span className="text-gray-400 font-normal">(optional)</span>
+              <span className="text-ink-3 font-normal">(optional)</span>
             </label>
             <textarea
               id="description"
@@ -258,18 +258,18 @@ export default function NewCommunityPage() {
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="Tell potential members what your community is about..."
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+              className="mt-1 block w-full rounded-lg border border-border bg-warm px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600">{error}</p>
+            <p className="text-sm text-rose">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={isSubmitting || !name.trim()}
-            className="w-full rounded-md bg-black px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full rounded-xl bg-ink px-4 py-3 text-sm font-semibold text-white hover:bg-ink/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Creating..." : "Create Community"}
           </button>

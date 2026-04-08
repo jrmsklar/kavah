@@ -119,19 +119,19 @@ const DashboardSidebar = () => {
     : "";
 
   return (
-    <nav className="fixed top-0 left-0 w-full h-full border-r bg-white space-y-8 sm:w-80">
+    <nav className="fixed top-0 left-0 w-full h-full border-r border-border bg-warm space-y-8 sm:w-80">
       <div className="flex flex-col h-full px-4">
-        {/* User profile header */}
+        {/* Brand */}
         <div className="h-20 flex items-center pl-2">
           <div className="w-full flex items-center gap-x-4">
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600">
+            <div className="w-10 h-10 rounded-full bg-gold-pale flex items-center justify-center text-sm font-semibold text-gold">
               {initials || "U"}
             </div>
             <div>
-              <span className="block text-gray-700 text-sm font-semibold">
+              <span className="block text-ink text-sm font-semibold">
                 {user?.firstName} {user?.lastName}
               </span>
-              <span className="block mt-px text-gray-600 text-xs">
+              <span className="block mt-px text-ink-3 text-xs">
                 {user?.primaryPhoneNumber?.phoneNumber ?? "Dashboard"}
               </span>
             </div>
@@ -139,7 +139,7 @@ const DashboardSidebar = () => {
             <div className="relative flex-1 text-right">
               <button
                 ref={profileRef}
-                className="p-1.5 rounded-md text-gray-500 hover:bg-gray-50 active:bg-gray-100"
+                className="p-1.5 rounded-md text-ink-3 hover:bg-cream active:bg-border-subtle"
                 onClick={() => setIsProfileActive((v) => !v)}
                 aria-haspopup="menu"
                 aria-expanded={isProfileActive}
@@ -164,14 +164,14 @@ const DashboardSidebar = () => {
                 <div
                   id="profile-menu"
                   role="menu"
-                  className="absolute z-10 top-12 right-0 w-64 rounded-lg bg-white shadow-md border text-sm text-gray-600"
+                  className="absolute z-10 top-12 right-0 w-64 rounded-xl bg-warm shadow-lg border border-border text-sm text-ink-2"
                 >
                   <div className="p-2 text-left">
-                    <span className="block text-gray-500/80 p-2">
+                    <span className="block text-ink-3 p-2">
                       {user?.primaryPhoneNumber?.phoneNumber}
                     </span>
                     <button
-                      className="block w-full p-2 text-left rounded-md hover:bg-gray-50 active:bg-gray-100 duration-150"
+                      className="block w-full p-2 text-left rounded-lg hover:bg-cream active:bg-border-subtle duration-150"
                       onClick={() => signOut()}
                       role="menuitem"
                     >
@@ -193,18 +193,20 @@ const DashboardSidebar = () => {
                   href={item.href}
                   className={`flex items-center gap-x-2 p-2 rounded-lg duration-150 ${
                     pathname?.startsWith(item.href)
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-600 hover:bg-gray-50 active:bg-gray-100"
+                      ? "bg-gold-pale text-ink"
+                      : "text-ink-2 hover:bg-cream active:bg-gold-pale"
                   }`}
                 >
-                  <div className="text-gray-500">{item.icon}</div>
+                  <div className={pathname?.startsWith(item.href) ? "text-gold" : "text-ink-3"}>
+                    {item.icon}
+                  </div>
                   {item.name}
                 </Link>
               </li>
             ))}
           </ul>
 
-          <div className="pt-2 mt-2 border-t">
+          <div className="pt-2 mt-2 border-t border-border-subtle">
             <ul className="text-sm font-medium">
               {navsFooter.map((item, idx) => (
                 <li key={idx}>
@@ -212,11 +214,13 @@ const DashboardSidebar = () => {
                     href={item.href}
                     className={`flex items-center gap-x-2 p-2 rounded-lg duration-150 ${
                       pathname?.startsWith(item.href)
-                        ? "bg-gray-100 text-gray-900"
-                        : "text-gray-600 hover:bg-gray-50 active:bg-gray-100"
+                        ? "bg-gold-pale text-ink"
+                        : "text-ink-2 hover:bg-cream active:bg-gold-pale"
                     }`}
                   >
-                    <div className="text-gray-500">{item.icon}</div>
+                    <div className={pathname?.startsWith(item.href) ? "text-gold" : "text-ink-3"}>
+                      {item.icon}
+                    </div>
                     {item.name}
                   </Link>
                 </li>

@@ -264,7 +264,7 @@ export function PromptBuilder({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-500">Loading...</p>
+        <div className="w-6 h-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
       </div>
     );
   }
@@ -278,18 +278,18 @@ export function PromptBuilder({
         <div>
           <Link
             href={`/communities/${slug}`}
-            className="text-sm text-gray-500 hover:text-gray-700 transition"
+            className="text-sm text-ink-3 hover:text-ink-2 transition"
           >
             &larr; Back to community
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-gray-900">
+          <h1 className="mt-2 font-serif text-2xl font-medium text-ink">
             Prompt Builder
           </h1>
         </div>
         <button
           onClick={handleSave}
           disabled={!dirty || saving}
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-white hover:bg-ink/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving ? "Saving..." : "Save"}
         </button>
@@ -329,7 +329,7 @@ export function PromptBuilder({
       {/* Add section */}
       <button
         onClick={addSection}
-        className="flex items-center gap-2 w-full justify-center rounded-lg border-2 border-dashed border-gray-300 p-4 text-sm text-gray-500 hover:border-gray-400 hover:text-gray-700 transition"
+        className="flex items-center gap-2 w-full justify-center rounded-xl border-2 border-dashed border-border p-4 text-sm text-ink-3 hover:border-ink-3/30 hover:text-ink-2 transition"
         type="button"
       >
         <Plus className="w-4 h-4" />

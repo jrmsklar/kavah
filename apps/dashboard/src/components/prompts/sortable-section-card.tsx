@@ -59,14 +59,14 @@ export function SortableSectionCard({
     <div
       ref={setNodeRef}
       style={style}
-      className="rounded-lg border bg-white p-4 mb-4 shadow-sm"
+      className="rounded-xl border border-border bg-warm p-4 mb-4"
     >
       {/* Section header */}
       <div className="flex items-center gap-2 mb-3">
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab text-gray-400 hover:text-gray-600"
+          className="cursor-grab text-ink-3 hover:text-ink-2"
           type="button"
         >
           <GripVertical className="w-5 h-5" />
@@ -77,7 +77,7 @@ export function SortableSectionCard({
           value={section.title}
           onChange={(e) => onUpdateSection({ title: e.target.value })}
           placeholder="Section title..."
-          className="flex-1 rounded border border-gray-200 px-2 py-1.5 text-sm font-semibold focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+          className="flex-1 rounded-lg border border-border bg-cream px-2 py-1.5 text-sm font-semibold text-ink focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
         />
 
         <select
@@ -85,7 +85,7 @@ export function SortableSectionCard({
           onChange={(e) =>
             onUpdateSection({ step: e.target.value as StepType })
           }
-          className="rounded border border-gray-200 px-2 py-1.5 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+          className="rounded-lg border border-border bg-cream px-2 py-1.5 text-sm text-ink focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
         >
           {STEP_TYPES.map(([value, label]) => (
             <option key={value} value={value}>
@@ -96,7 +96,7 @@ export function SortableSectionCard({
 
         <button
           onClick={onRemoveSection}
-          className="text-gray-400 hover:text-red-500 p-1"
+          className="text-ink-3 hover:text-rose p-1"
           type="button"
         >
           <Trash2 className="w-4 h-4" />
@@ -119,7 +119,7 @@ export function SortableSectionCard({
       {/* Add prompt button */}
       <button
         onClick={onAddPrompt}
-        className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mt-2 px-2"
+        className="flex items-center gap-1 text-sm text-ink-3 hover:text-ink-2 mt-2 px-2"
         type="button"
       >
         <Plus className="w-4 h-4" />

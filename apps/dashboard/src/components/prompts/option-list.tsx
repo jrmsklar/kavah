@@ -42,14 +42,14 @@ export function OptionList({
 
   return (
     <div className="ml-6 mt-2 space-y-1">
-      <p className="text-xs font-medium text-gray-500 mb-1">Options</p>
+      <p className="text-xs font-medium text-ink-3 mb-1">Options</p>
       {options.map((option, index) => (
         <div key={option.id} className="flex items-center gap-1">
           <div className="flex flex-col">
             <button
               onClick={() => moveUp(index)}
               disabled={index === 0}
-              className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+              className="text-ink-3 hover:text-ink-2 disabled:opacity-30"
               type="button"
             >
               <ChevronUp className="w-3 h-3" />
@@ -57,7 +57,7 @@ export function OptionList({
             <button
               onClick={() => moveDown(index)}
               disabled={index === options.length - 1}
-              className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+              className="text-ink-3 hover:text-ink-2 disabled:opacity-30"
               type="button"
             >
               <ChevronDown className="w-3 h-3" />
@@ -68,11 +68,11 @@ export function OptionList({
             value={option.label}
             onChange={(e) => updateLabel(option.id, e.target.value)}
             placeholder="Option label"
-            className="flex-1 rounded border border-gray-200 px-2 py-1 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            className="flex-1 rounded-lg border border-border bg-warm px-2 py-1 text-sm text-ink focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
           />
           <button
             onClick={() => removeOption(option.id)}
-            className="text-gray-400 hover:text-red-500 p-1"
+            className="text-ink-3 hover:text-rose p-1"
             type="button"
           >
             <X className="w-3 h-3" />
@@ -81,7 +81,7 @@ export function OptionList({
       ))}
       <button
         onClick={addOption}
-        className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 mt-1"
+        className="flex items-center gap-1 text-xs text-ink-3 hover:text-ink-2 mt-1"
         type="button"
       >
         <Plus className="w-3 h-3" />

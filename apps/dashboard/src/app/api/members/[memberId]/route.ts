@@ -4,6 +4,85 @@ import { NextRequest, NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ memberId: string }> };
 
+export async function PATCH(req: NextRequest, { params }: RouteContext) {
+  const { memberId } = await params;
+  const { userId: clerkId } = await auth();
+  if (!clerkId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const communityId = req.nextUrl.searchParams.get("community_id");
+  if (!communityId) {
+    return NextResponse.json(
+      { error: "community_id is required" },
+      { status: 400 }
+    );
+  }
+
+  const body = await req.json();
+  const { birthday, height_inches, city } = body;
+
+  const supabase = createServiceClient();
+
+  // Verify the caller owns this community
+  const { data: callerUser } = await supabase
+    .from("users")
+    .select("id")
+    .eq("clerk_id", clerkId)
+    .single();
+
+  if (!callerUser) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  const { data: callerMembership } = await supabase
+    .from("memberships")
+    .select("id")
+    .eq("user_id", callerUser.id)
+    .eq("community_id", communityId)
+    .in("role", ["owner", "admin"])
+    .single();
+
+  if (!callerMembership) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  // Fetch the membership to get user_id
+  const { data: membership } = await supabase
+    .from("memberships")
+    .select("user_id")
+    .eq("id", memberId)
+    .eq("community_id", communityId)
+    .single();
+
+  if (!membership) {
+    return NextResponse.json({ error: "Member not found" }, { status: 404 });
+  }
+
+  // Upsert user profile
+  const { error: profileError } = await supabase
+    .from("user_profiles")
+    .upsert(
+      {
+        user_id: membership.user_id,
+        birthday: birthday ?? null,
+        height_inches: height_inches ?? null,
+        city: city ?? null,
+      },
+      { onConflict: "user_id" }
+    );
+
+  if (profileError) {
+    console.error("Failed to update user profile:", profileError);
+    return NextResponse.json(
+      { error: "Failed to update profile" },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ success: true });
+}
+
 export async function GET(req: NextRequest, { params }: RouteContext) {
   const { memberId } = await params;
   const { userId: clerkId } = await auth();
@@ -66,6 +145,13 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
+
+  // Fetch user profile
+  const { data: userProfile } = await supabase
+    .from("user_profiles")
+    .select("birthday, height_inches, city")
+    .eq("user_id", membership.user_id)
+    .single();
 
   // Fetch prompt sections for this community
   const { data: sections } = await supabase
@@ -202,12 +288,15 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   return NextResponse.json({
     member: {
       id: membership.id,
+      user_id: membership.user_id,
       first_name: user.first_name,
       last_name: user.last_name,
       phone: user.phone,
-      birthday: user.birthday,
+      birthday: userProfile?.birthday ?? user.birthday,
       avatar_url: user.avatar_url,
       joined: membership.created_at,
+      height_inches: userProfile?.height_inches ?? null,
+      city: userProfile?.city ?? null,
     },
     promptSections: promptTree,
   });

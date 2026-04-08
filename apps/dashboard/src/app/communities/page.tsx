@@ -13,14 +13,14 @@ export default async function CommunitiesPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-8">
         <div className="max-w-md text-center">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gold-pale flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-8 h-8 text-gray-400"
+              className="w-8 h-8 text-gold"
             >
               <path
                 strokeLinecap="round"
@@ -29,16 +29,16 @@ export default async function CommunitiesPage() {
               />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="font-serif text-2xl font-medium text-ink">
             Create your first community
           </h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-ink-2">
             Get started by creating a community. You&apos;ll be able to invite
             members, set up prompts, and start making matches.
           </p>
           <Link
             href="/communities/new"
-            className="mt-6 inline-block rounded-md bg-black px-6 py-3 text-sm font-medium text-white hover:bg-gray-800 transition"
+            className="mt-6 inline-block rounded-xl bg-ink px-6 py-3 text-sm font-semibold text-white hover:bg-ink/90 transition"
           >
             Get Started
           </Link>
@@ -50,10 +50,10 @@ export default async function CommunitiesPage() {
   return (
     <div className="p-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Communities</h1>
+        <h1 className="font-serif text-2xl font-medium text-ink">Communities</h1>
         <Link
           href="/communities/new"
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition"
+          className="rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-white hover:bg-ink/90 transition"
         >
           New Community
         </Link>
@@ -63,17 +63,17 @@ export default async function CommunitiesPage() {
           <Link
             key={community.id}
             href={`/communities/${community.slug}`}
-            className="block rounded-lg border p-6 hover:border-gray-400 transition"
+            className="block rounded-xl border border-border bg-warm p-6 hover:border-ink-3/30 transition"
           >
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="font-serif text-lg font-medium text-ink">
               {community.name}
             </h3>
             {community.description && (
-              <p className="mt-1 text-sm text-gray-600 line-clamp-2">
+              <p className="mt-1 text-sm text-ink-2 line-clamp-2">
                 {community.description}
               </p>
             )}
-            <p className="mt-3 text-xs text-gray-400">
+            <p className="mt-3 text-xs text-ink-3">
               Created {new Date(community.created_at).toLocaleDateString()}
             </p>
           </Link>

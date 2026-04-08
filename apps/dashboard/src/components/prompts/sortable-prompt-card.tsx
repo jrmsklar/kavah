@@ -42,14 +42,14 @@ export function SortablePromptCard({
     <div
       ref={setNodeRef}
       style={style}
-      className="rounded border bg-gray-50 p-3 mb-2"
+      className="rounded-lg border border-border-subtle bg-cream p-3 mb-2"
     >
       <div className="flex items-start gap-2">
         {/* Drag handle */}
         <button
           {...attributes}
           {...listeners}
-          className="mt-1 cursor-grab text-gray-400 hover:text-gray-600"
+          className="mt-1 cursor-grab text-ink-3 hover:text-ink-2"
           type="button"
         >
           <GripVertical className="w-4 h-4" />
@@ -62,7 +62,7 @@ export function SortablePromptCard({
             value={prompt.label}
             onChange={(e) => onUpdate({ label: e.target.value })}
             placeholder="Enter prompt label..."
-            className="w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-border bg-warm px-2 py-1.5 text-sm text-ink focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
           />
 
           <div className="flex items-center gap-3">
@@ -70,7 +70,7 @@ export function SortablePromptCard({
             <select
               value={prompt.type}
               onChange={(e) => onUpdate({ type: e.target.value as PromptType })}
-              className="rounded border border-gray-200 px-2 py-1 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+              className="rounded-lg border border-border bg-warm px-2 py-1 text-sm text-ink focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
             >
               {PROMPT_TYPES.map(([value, label]) => (
                 <option key={value} value={value}>
@@ -80,12 +80,12 @@ export function SortablePromptCard({
             </select>
 
             {/* Required toggle */}
-            <label className="flex items-center gap-1.5 text-sm text-gray-600">
+            <label className="flex items-center gap-1.5 text-sm text-ink-2">
               <input
                 type="checkbox"
                 checked={prompt.required}
                 onChange={(e) => onUpdate({ required: e.target.checked })}
-                className="rounded border-gray-300"
+                className="rounded border-border accent-gold"
               />
               Required
             </label>
@@ -95,7 +95,7 @@ export function SortablePromptCard({
         {/* Delete */}
         <button
           onClick={onRemove}
-          className="text-gray-400 hover:text-red-500 p-1"
+          className="text-ink-3 hover:text-rose p-1"
           type="button"
         >
           <X className="w-4 h-4" />

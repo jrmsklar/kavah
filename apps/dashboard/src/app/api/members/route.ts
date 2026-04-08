@@ -59,16 +59,27 @@ export async function GET(req: NextRequest) {
     .select("id, first_name, last_name")
     .in("id", userIds);
 
+  // Fetch user profiles for all members
+  const { data: profiles } = await supabase
+    .from("user_profiles")
+    .select("user_id, birthday, height_inches, city")
+    .in("user_id", userIds);
+
   const userMap = new Map(users?.map((u) => [u.id, u]) ?? []);
+  const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
 
   const members = memberships.map((m) => {
     const user = userMap.get(m.user_id);
+    const profile = profileMap.get(m.user_id);
     return {
       id: m.id,
       user_id: m.user_id,
       first_name: user?.first_name ?? "",
       last_name: user?.last_name ?? "",
       joined: m.created_at,
+      birthday: profile?.birthday ?? null,
+      height_inches: profile?.height_inches ?? null,
+      city: profile?.city ?? null,
     };
   });
 
