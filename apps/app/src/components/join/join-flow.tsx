@@ -136,6 +136,19 @@ export function JoinFlow() {
   function handleSignUpComplete(sessionId: string, userId: string) {
     clerkSessionIdRef.current = sessionId;
     clerkUserIdRef.current = userId;
+
+    // Upsert user + create incomplete membership immediately
+    fetch("/api/join/init", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        communityId: community.id,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        phone: phone.startsWith("+") ? phone : `+1${phone}`,
+        clerkUserId: userId,
+      }),
+    }).catch((err) => console.error("join/init failed:", err));
   }
 
   async function handleSignInSuccess() {
