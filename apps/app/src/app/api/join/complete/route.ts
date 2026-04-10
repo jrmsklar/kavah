@@ -72,21 +72,38 @@ export async function POST(req: Request) {
     }
   }
 
-  // Check if membership already exists
+  // Activate membership (created as "incomplete" by /api/join/init)
   const { data: existing } = await supabase
     .from("memberships")
-    .select("id")
+    .select("id, status")
     .eq("user_id", user.id)
     .eq("community_id", communityId)
     .single();
 
-  if (!existing) {
+  if (existing) {
+    if (existing.status !== "active") {
+      const { error: updateError } = await supabase
+        .from("memberships")
+        .update({ status: "active" })
+        .eq("id", existing.id);
+
+      if (updateError) {
+        console.error("Failed to activate membership:", updateError);
+        return NextResponse.json(
+          { error: "Failed to activate membership" },
+          { status: 500 }
+        );
+      }
+    }
+  } else {
+    // Fallback: create membership if /api/join/init wasn't called
     const { error: membershipError } = await supabase
       .from("memberships")
       .insert({
         user_id: user.id,
         community_id: communityId,
         role: "member",
+        status: "active",
       });
 
     if (membershipError) {
@@ -96,11 +113,6 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
-  }
-
-  // Notify admins via email (fire-and-forget)
-  if (!existing) {
-    notifyAdmins(communityId, firstName, lastName, supabase);
   }
 
   // Save responses if provided
