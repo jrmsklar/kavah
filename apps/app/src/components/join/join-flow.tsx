@@ -256,12 +256,6 @@ export function JoinFlow() {
         throw new Error(data.error || "Failed to complete sign-up");
       }
 
-      // Activate session if new user
-      const sessionId = clerkSessionIdRef.current ?? signUp?.createdSessionId;
-      if (sessionId && setActive && !isExistingUser) {
-        await setActive({ session: sessionId });
-      }
-
       setStep("complete");
     } catch (err) {
       setCompleteError(
@@ -314,6 +308,7 @@ export function JoinFlow() {
         onSignUpComplete={handleSignUpComplete}
         onNext={() => setStep("welcome")}
         onSignInSuccess={handleSignInSuccess}
+        setActiveSignUp={setActive ? (p) => setActive(p) : undefined}
       />
     );
   }

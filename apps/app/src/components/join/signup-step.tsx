@@ -20,6 +20,7 @@ export function SignupStep({
   onSignUpComplete,
   onNext,
   onSignInSuccess,
+  setActiveSignUp,
 }: {
   signUp: SignUpResource | undefined;
   isLoaded: boolean;
@@ -33,6 +34,7 @@ export function SignupStep({
   onSignUpComplete: (sessionId: string, userId: string) => void;
   onNext: () => void;
   onSignInSuccess: () => void | Promise<void>;
+  setActiveSignUp: ((params: { session: string }) => Promise<void>) | undefined;
 }) {
   const { signIn, setActive: setActiveSignIn, isLoaded: signInLoaded } = useSignIn();
 
@@ -154,6 +156,10 @@ export function SignupStep({
           const userId = result.createdUserId;
           if (sessionId || userId) {
             onSignUpComplete(sessionId ?? "", userId ?? "");
+          }
+          // Activate session immediately so Clerk context updates (PostHog, etc.)
+          if (sessionId && setActiveSignUp) {
+            await setActiveSignUp({ session: sessionId });
           }
           setPhoneVerified(true);
           setSubmitting(false);
