@@ -19,7 +19,7 @@ import { StepProgress } from "./step-progress";
 import { CommunityHeader } from "./community-header";
 import { AlreadyJoinedStep } from "./already-joined-step";
 
-type Step = "landing" | "signup" | "welcome" | "basics" | "video" | "review" | "complete";
+type Step = "landing" | "signup" | "welcome" | "basics" | "video" | "review" | "complete" | "already-joined";
 
 function PoweredByKavah() {
   return (
@@ -68,6 +68,7 @@ const stepNumber: Record<Step, number> = {
   video: 3,
   review: 4,
   complete: 0,
+  "already-joined": 0,
 };
 
 export function JoinFlow() {
@@ -79,14 +80,7 @@ export function JoinFlow() {
   const { signUp, isLoaded: signUpLoaded, setActive } = useSignUp();
   const { user, isSignedIn, isLoaded: userLoaded } = useUser();
 
-  const wasSignedInRef = useRef(false);
-  useEffect(() => {
-    if (userLoaded) {
-      wasSignedInRef.current = isSignedIn ?? false;
-    }
-  }, [userLoaded]);
-
-  const isExistingUser = wasSignedInRef.current && !!user;
+  const isExistingUser = !!isSignedIn && !!user;
 
   const [step, setStep] = useState<Step>("landing");
   const [firstName, setFirstName] = useState("");
@@ -142,6 +136,22 @@ export function JoinFlow() {
   function handleSignUpComplete(sessionId: string, userId: string) {
     clerkSessionIdRef.current = sessionId;
     clerkUserIdRef.current = userId;
+  }
+
+  async function handleSignInSuccess() {
+    try {
+      const res = await fetch(`/api/communities/${community.id}/membership`);
+      if (res.ok) {
+        const { isMember: nowMember } = (await res.json()) as { isMember: boolean };
+        if (nowMember) {
+          setStep("already-joined");
+          return;
+        }
+      }
+    } catch {
+      // fall through
+    }
+    setStep("welcome");
   }
 
   function handleUpdateResponse(promptId: string, value: string, localUrl?: string) {
@@ -254,7 +264,7 @@ export function JoinFlow() {
   }
 
   // Already a member — show message instead of join flow
-  if (step === "landing" && isMember) {
+  if (step === "already-joined" || (step === "landing" && isMember)) {
     return <AlreadyJoinedStep />;
   }
 
@@ -287,6 +297,7 @@ export function JoinFlow() {
         setPhoneVerified={setPhoneVerified}
         onSignUpComplete={handleSignUpComplete}
         onNext={() => setStep("welcome")}
+        onSignInSuccess={handleSignInSuccess}
       />
     );
   }

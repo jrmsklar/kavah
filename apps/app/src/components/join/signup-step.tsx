@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useSignUp, useClerk } from "@clerk/nextjs";
-import { usePathname } from "next/navigation";
+import { useSignUp, useSignIn } from "@clerk/nextjs";
 
 type SignUpResource = NonNullable<ReturnType<typeof useSignUp>["signUp"]>;
+
+type Mode = "signup" | "signin";
 
 export function SignupStep({
   signUp,
@@ -18,6 +19,7 @@ export function SignupStep({
   setPhoneVerified,
   onSignUpComplete,
   onNext,
+  onSignInSuccess,
 }: {
   signUp: SignUpResource | undefined;
   isLoaded: boolean;
@@ -30,15 +32,15 @@ export function SignupStep({
   setPhoneVerified: (v: boolean) => void;
   onSignUpComplete: (sessionId: string, userId: string) => void;
   onNext: () => void;
+  onSignInSuccess: () => void | Promise<void>;
 }) {
-  const clerk = useClerk();
-  const pathname = usePathname();
+  const { signIn, setActive: setActiveSignIn, isLoaded: signInLoaded } = useSignIn();
 
+  const [mode, setMode] = useState<Mode>("signup");
   const [verifying, setVerifying] = useState(false);
   const [code, setCode] = useState("");
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [phoneAlreadyExists, setPhoneAlreadyExists] = useState(false);
   const [country, setCountry] = useState("US");
 
   const codeInputRef = useRef<HTMLInputElement>(null);
@@ -59,33 +61,61 @@ export function SignupStep({
   }
 
   const fieldsValid =
-    isLoaded && firstName.trim() && lastName.trim() && phone.length >= 10;
+    isLoaded && signInLoaded && firstName.trim() && lastName.trim() && phone.length >= 10;
 
   const canSubmit = verifying ? code.length === 6 && !submitting : fieldsValid && !submitting;
 
+  async function startSignIn(formattedPhone: string) {
+    if (!signIn) throw new Error("Sign-in not ready");
+    const attempt = await signIn.create({ identifier: formattedPhone });
+    const phoneFactor = attempt.supportedFirstFactors?.find(
+      (f): f is Extract<typeof f, { strategy: "phone_code" }> => f.strategy === "phone_code"
+    );
+    if (!phoneFactor) {
+      throw new Error("Phone verification isn't available for this account.");
+    }
+    await signIn.prepareFirstFactor({
+      strategy: "phone_code",
+      phoneNumberId: phoneFactor.phoneNumberId,
+    });
+  }
+
   async function handleSendCode() {
-    if (!signUp || !fieldsValid) return;
+    if (!fieldsValid || !signUp) return;
     setSubmitting(true);
     setVerifyError(null);
-    setPhoneAlreadyExists(false);
+
+    const formattedPhone = `+1${phone}`;
 
     try {
-      const formattedPhone = `+1${phone}`;
       await signUp.create({
         phoneNumber: formattedPhone,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
       });
       await signUp.preparePhoneNumberVerification({ strategy: "phone_code" });
+      setMode("signup");
       setVerifying(true);
     } catch (err: unknown) {
-      console.error("Clerk signUp error:", err);
       const clerkError = err as { errors?: { code: string; message: string }[] };
       const errors = clerkError.errors ?? [];
       const exists = errors.some((e) => e.code === "form_identifier_exists");
+
       if (exists) {
-        setPhoneAlreadyExists(true);
+        // Phone already has an account — switch to sign-in flow
+        try {
+          await startSignIn(formattedPhone);
+          setMode("signin");
+          setVerifying(true);
+        } catch (signInErr: unknown) {
+          console.error("Clerk signIn error:", signInErr);
+          const e = signInErr as { errors?: { message: string }[] };
+          setVerifyError(
+            e.errors?.[0]?.message ?? "Failed to send verification code"
+          );
+        }
       } else {
+        console.error("Clerk signUp error:", err);
         setVerifyError(errors[0]?.message ?? "Failed to send verification code");
       }
     } finally {
@@ -94,27 +124,42 @@ export function SignupStep({
   }
 
   async function handleVerifyCode() {
-    if (!signUp || code.length !== 6) return;
+    if (code.length !== 6) return;
     setSubmitting(true);
     setVerifyError(null);
 
     try {
-      const result = await signUp.attemptPhoneNumberVerification({ code });
-
-      const phoneStatus = result.verifications?.phoneNumber?.status;
-      if (phoneStatus === "verified" || result.status === "complete") {
-        const sessionId = result.createdSessionId;
-        const userId = result.createdUserId;
-
-        if (sessionId || userId) {
-          onSignUpComplete(sessionId ?? "", userId ?? "");
+      if (mode === "signin") {
+        if (!signIn) throw new Error("Sign-in not ready");
+        const result = await signIn.attemptFirstFactor({
+          strategy: "phone_code",
+          code,
+        });
+        if (result.status === "complete") {
+          if (result.createdSessionId && setActiveSignIn) {
+            await setActiveSignIn({ session: result.createdSessionId });
+          }
+          setPhoneVerified(true);
+          await onSignInSuccess();
+          setSubmitting(false);
+          return;
         }
-
-        setPhoneVerified(true);
-        setSubmitting(false);
-        onNext();
-        return;
+        setVerifyError("Verification failed. Please try again.");
       } else {
+        if (!signUp) throw new Error("Sign-up not ready");
+        const result = await signUp.attemptPhoneNumberVerification({ code });
+        const phoneStatus = result.verifications?.phoneNumber?.status;
+        if (phoneStatus === "verified" || result.status === "complete") {
+          const sessionId = result.createdSessionId;
+          const userId = result.createdUserId;
+          if (sessionId || userId) {
+            onSignUpComplete(sessionId ?? "", userId ?? "");
+          }
+          setPhoneVerified(true);
+          setSubmitting(false);
+          onNext();
+          return;
+        }
         setVerifyError("Verification failed. Please try again.");
       }
     } catch (err: unknown) {
@@ -128,10 +173,14 @@ export function SignupStep({
   }
 
   async function handleResendCode() {
-    if (!signUp) return;
     setVerifyError(null);
     try {
-      await signUp.preparePhoneNumberVerification({ strategy: "phone_code" });
+      if (mode === "signin") {
+        await startSignIn(`+1${phone}`);
+      } else {
+        if (!signUp) return;
+        await signUp.preparePhoneNumberVerification({ strategy: "phone_code" });
+      }
     } catch {
       setVerifyError("Failed to resend code. Please try again.");
     }
@@ -237,6 +286,14 @@ export function SignupStep({
           >
             <div className="overflow-hidden">
               <div className="rounded-xl border border-border bg-cream p-4">
+                {mode === "signin" && (
+                  <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-sage-light px-2.5 py-1 text-xs font-medium text-sage">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                    </svg>
+                    Welcome back
+                  </div>
+                )}
                 <p className="text-sm font-medium text-ink">
                   We sent a verification code to your phone.
                 </p>
@@ -264,34 +321,6 @@ export function SignupStep({
 
           {verifyError && (
             <p className="text-sm text-rose">{verifyError}</p>
-          )}
-
-          {phoneAlreadyExists && (
-            <div className="rounded-xl border border-rose-light bg-rose-light/40 p-4">
-              <p className="text-sm font-medium text-rose">
-                This phone number is already associated with an account.
-              </p>
-              <p className="mt-1 text-sm text-ink-2">
-                Sign in to continue, or try a different number.
-              </p>
-              <div className="mt-3 flex items-center gap-3">
-                <button
-                  onClick={() => clerk.redirectToSignIn({ redirectUrl: pathname })}
-                  className="rounded-lg bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90 transition"
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={() => {
-                    setPhoneAlreadyExists(false);
-                    setPhone("");
-                  }}
-                  className="text-sm font-medium text-ink-2 underline underline-offset-2 hover:text-ink"
-                >
-                  Try a different number
-                </button>
-              </div>
-            </div>
           )}
         </div>
 
