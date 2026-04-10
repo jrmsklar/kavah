@@ -11,6 +11,7 @@ import {
 } from "@/app/join/[community_slug]/community-context";
 import { WelcomeStep } from "./welcome-step";
 import { SignupStep } from "./signup-step";
+import { AboutYouStep } from "./about-you-step";
 import { BasicsStep } from "./basics-step";
 import { VideoStep } from "./video-step";
 import { ReviewStep } from "./review-step";
@@ -18,7 +19,7 @@ import { StepProgress } from "./step-progress";
 import { CommunityHeader } from "./community-header";
 import { AlreadyJoinedStep } from "./already-joined-step";
 
-type Step = "landing" | "welcome" | "basics" | "video" | "review" | "complete";
+type Step = "landing" | "signup" | "welcome" | "basics" | "video" | "review" | "complete";
 
 function PoweredByKavah() {
   return (
@@ -61,6 +62,7 @@ function ReferButton({ communitySlug }: { communitySlug: string }) {
 
 const stepNumber: Record<Step, number> = {
   landing: 0,
+  signup: 0,
   welcome: 1,
   basics: 2,
   video: 3,
@@ -258,7 +260,11 @@ export function JoinFlow() {
 
   // STEP: Landing (community info + Join CTA)
   if (step === "landing") {
-    return <WelcomeStep onNext={() => setStep("welcome")} />;
+    return (
+      <WelcomeStep
+        onNext={() => setStep(isSignedIn ? "welcome" : "signup")}
+      />
+    );
   }
 
   // Steps that show community header + stepper
@@ -267,27 +273,34 @@ export function JoinFlow() {
   // Determine step content
   let stepContent: React.ReactNode = null;
 
-  if (step === "welcome") {
+  if (step === "signup") {
     stepContent = (
       <SignupStep
         signUp={signUp ?? undefined}
         isLoaded={signUpLoaded}
-        isExistingUser={isExistingUser}
         firstName={firstName}
         setFirstName={setFirstName}
         lastName={lastName}
         setLastName={setLastName}
         phone={phone}
         setPhone={setPhone}
-        phoneVerified={phoneVerified}
         setPhoneVerified={setPhoneVerified}
+        onSignUpComplete={handleSignUpComplete}
+        onNext={() => setStep("welcome")}
+      />
+    );
+  }
+
+  if (step === "welcome") {
+    stepContent = (
+      <AboutYouStep
+        isExistingUser={isExistingUser}
         birthday={birthday}
         setBirthday={setBirthday}
         heightInches={heightInches}
         setHeightInches={setHeightInches}
         city={city}
         setCity={setCity}
-        onSignUpComplete={handleSignUpComplete}
         onNext={afterWelcome}
       />
     );
@@ -360,7 +373,7 @@ export function JoinFlow() {
     return (
       <div className="min-h-screen flex flex-col">
         <CommunityHeader />
-        <StepProgress currentStep={currentStepNumber} />
+        {step !== "signup" && <StepProgress currentStep={currentStepNumber} />}
         <div className="flex-1">{stepContent}</div>
         <PoweredByKavah />
       </div>
