@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
   // Fetch all members (role='member') with their user info
   const { data: memberships } = await supabase
     .from("memberships")
-    .select("id, created_at, user_id, status")
+    .select("id, created_at, user_id, profile_status")
     .eq("community_id", communityId)
     .eq("role", "member");
 
@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
       first_name: user?.first_name ?? "",
       last_name: user?.last_name ?? "",
       joined: m.created_at,
-      status: m.status,
+      profile_status: m.profile_status,
       birthday: profile?.birthday ?? null,
       height_inches: profile?.height_inches ?? null,
       city: profile?.city ?? null,

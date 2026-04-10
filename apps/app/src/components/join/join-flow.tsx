@@ -155,11 +155,11 @@ export function JoinFlow() {
     try {
       const res = await fetch(`/api/communities/${community.id}/membership`);
       if (res.ok) {
-        const { isMember, status } = (await res.json()) as {
+        const { isMember, profileStatus } = (await res.json()) as {
           isMember: boolean;
-          status: string | null;
+          profileStatus: string | null;
         };
-        if (isMember && status === "active") {
+        if (isMember && profileStatus === "complete") {
           setStep("already-completed-profile");
           return;
         }

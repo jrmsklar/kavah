@@ -10,12 +10,12 @@ type Member = {
   first_name: string;
   last_name: string;
   joined: string;
-  status: string;
+  profile_status: string;
   birthday: string | null;
   height_inches: number | null;
   city: string | null;
 };
-type SortKey = "first_name" | "last_name" | "joined" | "status" | "birthday" | "height_inches" | "city";
+type SortKey = "first_name" | "last_name" | "joined" | "profile_status" | "birthday" | "height_inches" | "city";
 type SortDir = "asc" | "desc";
 
 function calculateAge(birthday: string): number {
@@ -101,9 +101,9 @@ export default function MembersPage() {
       } else if (sortKey === "city") {
         aVal = (a.city ?? "").toLowerCase();
         bVal = (b.city ?? "").toLowerCase();
-      } else if (sortKey === "status") {
-        aVal = a.status;
-        bVal = b.status;
+      } else if (sortKey === "profile_status") {
+        aVal = a.profile_status;
+        bVal = b.profile_status;
       } else {
         aVal = a[sortKey].toLowerCase();
         bVal = b[sortKey].toLowerCase();
@@ -204,7 +204,7 @@ export default function MembersPage() {
                 <SortHeader label="Age" sortKey="birthday" />
                 <SortHeader label="Height" sortKey="height_inches" />
                 <SortHeader label="Joined" sortKey="joined" />
-                <SortHeader label="Status" sortKey="status" />
+                <SortHeader label="Profile" sortKey="profile_status" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border-subtle">
@@ -243,12 +243,12 @@ export default function MembersPage() {
                   <td className="px-4 py-3">
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                        member.status === "active"
+                        member.profile_status === "complete"
                           ? "bg-sage-light text-sage"
                           : "bg-ink/5 text-ink-3"
                       }`}
                     >
-                      {member.status === "active" ? "Active" : "Incomplete"}
+                      {member.profile_status === "complete" ? "Complete" : "Incomplete"}
                     </span>
                   </td>
                 </tr>

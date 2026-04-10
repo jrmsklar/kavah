@@ -74,16 +74,16 @@ export async function POST(req: Request) {
   // Activate membership (created as "incomplete" by /api/join/init)
   const { data: existing } = await supabase
     .from("memberships")
-    .select("id, status")
+    .select("id, profile_status")
     .eq("user_id", user.id)
     .eq("community_id", communityId)
     .single();
 
   if (existing) {
-    if (existing.status !== "active") {
+    if (existing.profile_status !== "complete") {
       const { error: updateError } = await supabase
         .from("memberships")
-        .update({ status: "active" })
+        .update({ profile_status: "complete" })
         .eq("id", existing.id);
 
       if (updateError) {
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
         user_id: user.id,
         community_id: communityId,
         role: "member",
-        status: "active",
+        profile_status: "complete",
       });
 
     if (membershipError) {

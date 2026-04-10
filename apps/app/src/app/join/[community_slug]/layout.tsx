@@ -63,11 +63,11 @@ export default async function JoinLayout({
       if (user) {
         const { data: membership } = await supabase
           .from("memberships")
-          .select("id, status")
+          .select("id, profile_status")
           .eq("user_id", user.id)
           .eq("community_id", community.id)
           .single();
-        isMember = membership?.status === "active";
+        isMember = membership?.profile_status === "complete";
 
         const { data: profile } = await supabase
           .from("user_profiles")

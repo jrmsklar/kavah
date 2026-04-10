@@ -55,7 +55,7 @@ export async function POST(req: Request) {
   // Create membership with status = incomplete (skip if one already exists)
   const { data: existing } = await supabase
     .from("memberships")
-    .select("id, status")
+    .select("id, profile_status")
     .eq("user_id", user.id)
     .eq("community_id", communityId)
     .single();
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
         user_id: user.id,
         community_id: communityId,
         role: "member",
-        status: "incomplete",
+        profile_status: "incomplete",
       });
 
     if (membershipError) {

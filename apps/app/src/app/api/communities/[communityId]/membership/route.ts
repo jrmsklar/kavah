@@ -26,13 +26,13 @@ export async function GET(_req: Request, { params }: RouteContext) {
 
   const { data: membership } = await supabase
     .from("memberships")
-    .select("id, status")
+    .select("id, profile_status")
     .eq("user_id", user.id)
     .eq("community_id", communityId)
     .single();
 
   return NextResponse.json({
     isMember: !!membership,
-    status: membership?.status ?? null,
+    profileStatus: membership?.profile_status ?? null,
   });
 }
