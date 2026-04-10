@@ -3,7 +3,7 @@
 import { useCommunity } from "@/app/join/[community_slug]/community-context";
 import Link from "next/link";
 
-export function AlreadyJoinedStep() {
+export function CompletedProfileStep() {
   const community = useCommunity();
 
   return (
@@ -16,11 +16,11 @@ export function AlreadyJoinedStep() {
         </div>
 
         <h1 className="font-serif text-2xl font-medium text-ink">
-          Already joined {community.name}
+          Completed Profile
         </h1>
         <p className="mt-3 text-ink-2 leading-relaxed">
-          You&apos;re already a member of this community. Head home to see your
-          matches and updates.
+          You&apos;ve already completed your profile for <span className="font-semibold">{community.name}</span>. Head
+          home to see your matches and updates.
         </p>
 
         <Link

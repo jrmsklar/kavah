@@ -17,9 +17,9 @@ import { VideoStep } from "./video-step";
 import { ReviewStep } from "./review-step";
 import { StepProgress } from "./step-progress";
 import { CommunityHeader } from "./community-header";
-import { AlreadyJoinedStep } from "./already-joined-step";
+import { CompletedProfileStep } from "./completed-profile-step";
 
-type Step = "landing" | "signup" | "welcome" | "basics" | "video" | "review" | "complete" | "already-joined";
+type Step = "landing" | "signup" | "welcome" | "basics" | "video" | "review" | "complete" | "completed-profile";
 
 function PoweredByKavah() {
   return (
@@ -68,7 +68,7 @@ const stepNumber: Record<Step, number> = {
   video: 3,
   review: 4,
   complete: 0,
-  "already-joined": 0,
+  "completed-profile": 0,
 };
 
 export function JoinFlow() {
@@ -155,9 +155,12 @@ export function JoinFlow() {
     try {
       const res = await fetch(`/api/communities/${community.id}/membership`);
       if (res.ok) {
-        const { isMember: nowMember } = (await res.json()) as { isMember: boolean };
-        if (nowMember) {
-          setStep("already-joined");
+        const { isMember, status } = (await res.json()) as {
+          isMember: boolean;
+          status: string | null;
+        };
+        if (isMember && status === "active") {
+          setStep("completed-profile");
           return;
         }
       }
@@ -277,8 +280,8 @@ export function JoinFlow() {
   }
 
   // Already a member — show message instead of join flow
-  if (step === "already-joined" || (step === "landing" && isMember)) {
-    return <AlreadyJoinedStep />;
+  if (step === "completed-profile" || (step === "landing" && isMember)) {
+    return <CompletedProfileStep />;
   }
 
   // STEP: Landing (community info + Join CTA)
