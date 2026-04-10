@@ -3,7 +3,7 @@
 import { useCommunity } from "@/app/join/[community_slug]/community-context";
 import Link from "next/link";
 
-export function CompletedProfileStep() {
+export function AlreadyCompletedProfileStep() {
   const community = useCommunity();
 
   return (
