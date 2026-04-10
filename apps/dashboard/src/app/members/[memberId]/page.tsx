@@ -13,6 +13,7 @@ type MemberDetail = {
   birthday: string | null;
   avatar_url: string | null;
   joined: string;
+  status: string;
   height_inches: number | null;
   city: string | null;
 };
@@ -138,9 +139,20 @@ export default function MemberDetailPage() {
             </div>
           )}
           <div>
-            <h1 className="font-serif text-2xl font-medium text-ink">
-              {member.first_name} {member.last_name}
-            </h1>
+            <div className="flex items-center gap-2.5">
+              <h1 className="font-serif text-2xl font-medium text-ink">
+                {member.first_name} {member.last_name}
+              </h1>
+              <span
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                  member.status === "active"
+                    ? "bg-sage-light text-sage"
+                    : "bg-ink/5 text-ink-3"
+                }`}
+              >
+                {member.status === "active" ? "Active" : "Incomplete"}
+              </span>
+            </div>
             <p className="text-sm text-ink-3">{formatPhone(member.phone)}</p>
           </div>
         </div>

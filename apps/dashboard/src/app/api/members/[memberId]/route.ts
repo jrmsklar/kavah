@@ -126,7 +126,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   // Fetch the membership record (memberId is the membership ID)
   const { data: membership } = await supabase
     .from("memberships")
-    .select("id, user_id, community_id, role, created_at")
+    .select("id, user_id, community_id, role, status, created_at")
     .eq("id", memberId)
     .eq("community_id", communityId)
     .single();
@@ -295,6 +295,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
       birthday: userProfile?.birthday ?? user.birthday,
       avatar_url: user.avatar_url,
       joined: membership.created_at,
+      status: membership.status,
       height_inches: userProfile?.height_inches ?? null,
       city: userProfile?.city ?? null,
     },
