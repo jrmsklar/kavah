@@ -202,7 +202,7 @@ export function SignupStep({
       <div className="max-w-md mx-auto w-full">
         <h1 className="font-serif text-2xl font-medium text-ink">Get started</h1>
         <p className="mt-1.5 text-sm text-ink-2">
-          We just need a few basics to get you started.
+          Let's get you set up.
         </p>
 
         <div className="mt-8 space-y-5">
