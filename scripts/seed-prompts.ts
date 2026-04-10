@@ -44,7 +44,7 @@ type SectionDef = {
 };
 
 const SEEDS: Record<string, SectionDef[]> = {
-  "friday-tables": [
+  "fridaytables": [
     {
       title: "Identity",
       step: "basics",
