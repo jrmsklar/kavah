@@ -5,7 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useClerk, useUser } from "@clerk/nextjs";
 
-const DashboardSidebar = () => {
+export function useSidebarState() {
+  const [open, setOpen] = useState(false);
+  return { open, setOpen };
+}
+
+const DashboardSidebar = ({ mobileOpen, onMobileClose }: { mobileOpen?: boolean; onMobileClose?: () => void }) => {
   const pathname = usePathname();
   const { user } = useUser();
   const { signOut } = useClerk();
@@ -118,8 +123,22 @@ const DashboardSidebar = () => {
     ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`
     : "";
 
+  // Close sidebar on navigation (mobile)
+  useEffect(() => {
+    if (onMobileClose) onMobileClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
   return (
-    <nav className="fixed top-0 left-0 w-full h-full border-r border-border bg-warm space-y-8 sm:w-80">
+    <>
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-ink/30 sm:hidden"
+          onClick={onMobileClose}
+        />
+      )}
+      <nav className={`fixed top-0 left-0 w-72 h-full border-r border-border bg-warm space-y-8 sm:w-80 z-40 transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0`}>
       <div className="flex flex-col h-full px-4">
         {/* Brand */}
         <div className="h-20 flex items-center pl-2">
@@ -230,6 +249,7 @@ const DashboardSidebar = () => {
         </div>
       </div>
     </nav>
+    </>
   );
 };
 

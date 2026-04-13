@@ -149,8 +149,12 @@ export default function MembersPage() {
     );
   }
 
+  const totalMembers = members.length;
+  const completeProfiles = members.filter((m) => m.profile_status === "complete").length;
+  const incompleteProfiles = totalMembers - completeProfiles;
+
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-serif text-2xl font-medium text-ink">Members</h1>
 
@@ -168,6 +172,24 @@ export default function MembersPage() {
         </select>
       </div>
 
+      {/* Summary stats */}
+      {!loading && members.length > 0 && (
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="rounded-xl border border-border bg-warm p-4">
+            <p className="text-xs text-ink-3 uppercase tracking-wide font-semibold">Total Members</p>
+            <p className="mt-1.5 text-2xl font-semibold text-ink">{totalMembers}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-warm p-4">
+            <p className="text-xs text-ink-3 uppercase tracking-wide font-semibold">Complete Profiles</p>
+            <p className="mt-1.5 text-2xl font-semibold text-ink">{completeProfiles}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-warm p-4">
+            <p className="text-xs text-ink-3 uppercase tracking-wide font-semibold">Incomplete Profiles</p>
+            <p className="mt-1.5 text-2xl font-semibold text-ink">{incompleteProfiles}</p>
+          </div>
+        </div>
+      )}
+
       {/* Search */}
       <div className="mb-4">
         <input
@@ -175,11 +197,11 @@ export default function MembersPage() {
           placeholder="Search by name or city..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-sm rounded-lg border border-border bg-warm px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
+          className="w-full sm:max-w-sm rounded-lg border border-border bg-warm px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
         />
       </div>
 
-      {/* Table */}
+      {/* Table / Cards */}
       {loading ? (
         <div className="flex items-center gap-2 text-ink-3 text-sm">
           <div className="w-4 h-4 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
@@ -194,68 +216,103 @@ export default function MembersPage() {
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-border bg-warm">
-          <table className="w-full text-sm">
-            <thead className="border-b border-border bg-cream">
-              <tr>
-                <SortHeader label="First Name" sortKey="first_name" />
-                <SortHeader label="Last Name" sortKey="last_name" />
-                <SortHeader label="City" sortKey="city" />
-                <SortHeader label="Age" sortKey="birthday" />
-                <SortHeader label="Height" sortKey="height_inches" />
-                <SortHeader label="Joined" sortKey="joined" />
-                <SortHeader label="Profile" sortKey="profile_status" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border-subtle">
-              {filtered.map((member) => (
-                <tr
-                  key={member.id}
-                  onClick={() => router.push(`/members/${member.id}?community_id=${selectedCommunityId}`)}
-                  className="hover:bg-cream/50 transition cursor-pointer"
-                >
-                  <td className="px-4 py-3 text-ink font-medium">
-                    {member.first_name}
-                  </td>
-                  <td className="px-4 py-3 text-ink">
-                    {member.last_name}
-                  </td>
-                  <td className="px-4 py-3 text-ink-2">
-                    {member.city || <span className="text-ink-3/50">&mdash;</span>}
-                  </td>
-                  <td className="px-4 py-3 text-ink-2">
-                    {member.birthday ? (
-                      calculateAge(member.birthday)
-                    ) : (
-                      <span className="text-ink-3/50">&mdash;</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-ink-2">
-                    {member.height_inches ? (
-                      formatHeight(member.height_inches)
-                    ) : (
-                      <span className="text-ink-3/50">&mdash;</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-ink-3">
-                    {new Date(member.joined).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                        member.profile_status === "complete"
-                          ? "bg-sage-light text-sage"
-                          : "bg-ink/5 text-ink-3"
-                      }`}
-                    >
-                      {member.profile_status === "complete" ? "Complete" : "Incomplete"}
-                    </span>
-                  </td>
+        <>
+          {/* Desktop table */}
+          <div className="hidden sm:block overflow-hidden rounded-xl border border-border bg-warm">
+            <table className="w-full text-sm">
+              <thead className="border-b border-border bg-cream">
+                <tr>
+                  <SortHeader label="First Name" sortKey="first_name" />
+                  <SortHeader label="Last Name" sortKey="last_name" />
+                  <SortHeader label="City" sortKey="city" />
+                  <SortHeader label="Age" sortKey="birthday" />
+                  <SortHeader label="Height" sortKey="height_inches" />
+                  <SortHeader label="Joined" sortKey="joined" />
+                  <SortHeader label="Profile" sortKey="profile_status" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-border-subtle">
+                {filtered.map((member) => (
+                  <tr
+                    key={member.id}
+                    onClick={() => router.push(`/members/${member.id}?community_id=${selectedCommunityId}`)}
+                    className="hover:bg-cream/50 transition cursor-pointer"
+                  >
+                    <td className="px-4 py-3 text-ink font-medium">
+                      {member.first_name}
+                    </td>
+                    <td className="px-4 py-3 text-ink">
+                      {member.last_name}
+                    </td>
+                    <td className="px-4 py-3 text-ink-2">
+                      {member.city || <span className="text-ink-3/50">&mdash;</span>}
+                    </td>
+                    <td className="px-4 py-3 text-ink-2">
+                      {member.birthday ? (
+                        calculateAge(member.birthday)
+                      ) : (
+                        <span className="text-ink-3/50">&mdash;</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-ink-2">
+                      {member.height_inches ? (
+                        formatHeight(member.height_inches)
+                      ) : (
+                        <span className="text-ink-3/50">&mdash;</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-ink-3">
+                      {new Date(member.joined).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                          member.profile_status === "complete"
+                            ? "bg-sage-light text-sage"
+                            : "bg-ink/5 text-ink-3"
+                        }`}
+                      >
+                        {member.profile_status === "complete" ? "Complete" : "Incomplete"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="sm:hidden space-y-3">
+            {filtered.map((member) => (
+              <div
+                key={member.id}
+                onClick={() => router.push(`/members/${member.id}?community_id=${selectedCommunityId}`)}
+                className="rounded-xl border border-border bg-warm p-4 cursor-pointer active:bg-cream transition"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-ink">
+                    {member.first_name} {member.last_name}
+                  </p>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                      member.profile_status === "complete"
+                        ? "bg-sage-light text-sage"
+                        : "bg-ink/5 text-ink-3"
+                    }`}
+                  >
+                    {member.profile_status === "complete" ? "Complete" : "Incomplete"}
+                  </span>
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-3">
+                  {member.city && <span>{member.city}</span>}
+                  {member.birthday && <span>Age {calculateAge(member.birthday)}</span>}
+                  {member.height_inches && <span>{formatHeight(member.height_inches)}</span>}
+                  <span>Joined {new Date(member.joined).toLocaleDateString()}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

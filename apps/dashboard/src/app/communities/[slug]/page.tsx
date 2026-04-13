@@ -83,7 +83,7 @@ export default async function CommunityDetailPage({
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <Link
         href="/communities"
         className="text-sm text-ink-3 hover:text-ink-2 transition"

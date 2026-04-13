@@ -48,7 +48,7 @@ export default async function CommunitiesPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-serif text-2xl font-medium text-ink">Communities</h1>
         <Link

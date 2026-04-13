@@ -100,7 +100,7 @@ export default function MemberDetailPage() {
 
   if (error || !member) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         <p className="text-rose font-medium">{error || "Member not found"}</p>
         <Link
           href="/members"
@@ -115,7 +115,7 @@ export default function MemberDetailPage() {
   const age = member.birthday ? calculateAge(member.birthday) : null;
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="p-4 sm:p-8 max-w-3xl">
       <Link
         href="/members"
         className="text-sm text-ink-3 hover:text-ink-2 transition"
