@@ -179,7 +179,7 @@ const DashboardSidebar = ({ mobileOpen, onMobileClose }: { mobileOpen?: boolean;
                 </svg>
               </button>
 
-              {pickerOpen && communities.length > 0 && (
+              {pickerOpen && (
                 <div className="absolute z-10 top-full left-0 right-0 mt-1 rounded-xl bg-warm shadow-lg border border-border text-sm overflow-hidden">
                   {communities.map((c) => (
                     <button
@@ -205,6 +205,18 @@ const DashboardSidebar = ({ mobileOpen, onMobileClose }: { mobileOpen?: boolean;
                       )}
                     </button>
                   ))}
+                  <Link
+                    href="/communities/new"
+                    onClick={() => setPickerOpen(false)}
+                    className="flex items-center gap-3 w-full px-3 py-2.5 text-left text-ink-3 hover:bg-cream transition border-t border-border-subtle"
+                  >
+                    <div className="w-7 h-7 rounded-md border border-dashed border-ink-3/30 flex items-center justify-center shrink-0">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      </svg>
+                    </div>
+                    <span className="font-medium">New Community</span>
+                  </Link>
                 </div>
               )}
             </div>

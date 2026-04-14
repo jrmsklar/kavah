@@ -3,12 +3,14 @@
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useCommunity } from "@/components/community-context";
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
 const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/gif"];
 
 export default function NewCommunityPage() {
   const router = useRouter();
+  const { refresh } = useCommunity();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -105,6 +107,7 @@ export default function NewCommunityPage() {
       }
 
       const { community } = await res.json();
+      await refresh(community.id);
       router.push("/overview");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -116,10 +119,10 @@ export default function NewCommunityPage() {
     <div className="flex min-h-screen items-start justify-center p-8 pt-24">
       <div className="w-full max-w-lg">
         <Link
-          href="/communities"
+          href="/overview"
           className="text-sm text-ink-3 hover:text-ink-2 transition"
         >
-          &larr; Back to communities
+          &larr; Back to overview
         </Link>
 
         <h1 className="mt-4 font-serif text-2xl font-medium text-ink">

@@ -108,6 +108,7 @@ export async function POST(req: Request) {
       user_id: user.id,
       community_id: community.id,
       role: "owner",
+      profile_status: "incomplete",
     });
 
   if (membershipError) {
