@@ -250,9 +250,10 @@ export default function Home() {
       <footer className="border-t border-border-subtle bg-warm">
         <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="font-serif text-sm text-ink-3">kavah</span>
-          <p className="text-xs text-ink-3">
-            Matching people at the level of who they actually are.
-          </p>
+          <div className="flex items-center gap-4 text-xs text-ink-3">
+            <Link href="/terms" className="hover:text-ink-2 transition">Terms</Link>
+            <Link href="/privacy" className="hover:text-ink-2 transition">Privacy</Link>
+          </div>
           <p className="text-xs text-ink-3">&copy; 2026 Kavah</p>
         </div>
       </footer>
