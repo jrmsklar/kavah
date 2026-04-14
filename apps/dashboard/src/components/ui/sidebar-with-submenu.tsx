@@ -3,17 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useClerk, useUser } from "@clerk/nextjs";
-
-export function useSidebarState() {
-  const [open, setOpen] = useState(false);
-  return { open, setOpen };
-}
+import { useCommunity } from "@/components/community-context";
 
 const DashboardSidebar = ({ mobileOpen, onMobileClose }: { mobileOpen?: boolean; onMobileClose?: () => void }) => {
   const pathname = usePathname();
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const { communities, selected, setSelected, loading } = useCommunity();
+
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setPickerOpen(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   const navigation = [
     {
@@ -106,23 +113,6 @@ const DashboardSidebar = ({ mobileOpen, onMobileClose }: { mobileOpen?: boolean;
     },
   ];
 
-  const profileRef = useRef<HTMLButtonElement | null>(null);
-  const [isProfileActive, setIsProfileActive] = useState(false);
-
-  useEffect(() => {
-    const handleProfile = (e: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
-        setIsProfileActive(false);
-      }
-    };
-    document.addEventListener("click", handleProfile);
-    return () => document.removeEventListener("click", handleProfile);
-  }, []);
-
-  const initials = user
-    ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`
-    : "";
-
   // Close sidebar on navigation (mobile)
   useEffect(() => {
     if (onMobileClose) onMobileClose();
@@ -138,38 +128,28 @@ const DashboardSidebar = ({ mobileOpen, onMobileClose }: { mobileOpen?: boolean;
           onClick={onMobileClose}
         />
       )}
-      <nav className={`fixed top-0 left-0 w-72 h-full border-r border-border bg-warm space-y-8 sm:w-80 z-40 transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0`}>
-      <div className="flex flex-col h-full px-4">
-        {/* Brand */}
-        <div className="h-20 flex items-center pl-2">
-          <div className="w-full flex items-center gap-x-4">
-            <div className="w-10 h-10 rounded-full bg-gold-pale flex items-center justify-center text-sm font-semibold text-gold">
-              {initials || "U"}
-            </div>
-            <div>
-              <span className="block text-ink text-sm font-semibold">
-                {user?.firstName} {user?.lastName}
-              </span>
-              <span className="block mt-px text-ink-3 text-xs">
-                {user?.primaryPhoneNumber?.phoneNumber ?? "Dashboard"}
-              </span>
-            </div>
-
-            <div className="relative flex-1 text-right">
+      <nav className={`fixed top-0 left-0 w-72 h-full border-r border-border bg-warm sm:w-80 z-40 transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0`}>
+        <div className="flex flex-col h-full px-4">
+          {/* Community switcher */}
+          <div className="h-20 flex items-center pl-2" ref={pickerRef}>
+            <div className="w-full relative">
               <button
-                ref={profileRef}
-                className="p-1.5 rounded-md text-ink-3 hover:bg-cream active:bg-border-subtle"
-                onClick={() => setIsProfileActive((v) => !v)}
-                aria-haspopup="menu"
-                aria-expanded={isProfileActive}
-                aria-controls="profile-menu"
+                onClick={() => setPickerOpen((v) => !v)}
+                className="w-full flex items-center gap-x-3 rounded-lg p-2 hover:bg-cream transition"
               >
+                <div className="w-9 h-9 rounded-lg bg-gold-pale flex items-center justify-center text-sm font-semibold text-gold shrink-0">
+                  {selected?.name?.[0] ?? "K"}
+                </div>
+                <div className="flex-1 text-left min-w-0">
+                  <span className="block text-sm font-semibold text-ink truncate">
+                    {loading ? "Loading..." : selected?.name ?? "Select community"}
+                  </span>
+                </div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  className="w-5 h-5"
-                  aria-hidden="true"
+                  className="w-4 h-4 text-ink-3 shrink-0"
                 >
                   <path
                     fillRule="evenodd"
@@ -179,55 +159,41 @@ const DashboardSidebar = ({ mobileOpen, onMobileClose }: { mobileOpen?: boolean;
                 </svg>
               </button>
 
-              {isProfileActive && (
-                <div
-                  id="profile-menu"
-                  role="menu"
-                  className="absolute z-10 top-12 right-0 w-64 rounded-xl bg-warm shadow-lg border border-border text-sm text-ink-2"
-                >
-                  <div className="p-2 text-left">
-                    <span className="block text-ink-3 p-2">
-                      {user?.primaryPhoneNumber?.phoneNumber}
-                    </span>
+              {pickerOpen && communities.length > 0 && (
+                <div className="absolute z-10 top-full left-0 right-0 mt-1 rounded-xl bg-warm shadow-lg border border-border text-sm overflow-hidden">
+                  {communities.map((c) => (
                     <button
-                      className="block w-full p-2 text-left rounded-lg hover:bg-cream active:bg-border-subtle duration-150"
-                      onClick={() => signOut()}
-                      role="menuitem"
+                      key={c.id}
+                      onClick={() => {
+                        setSelected(c);
+                        setPickerOpen(false);
+                      }}
+                      className={`flex items-center gap-3 w-full px-3 py-2.5 text-left transition ${
+                        selected?.id === c.id
+                          ? "bg-gold-pale text-ink"
+                          : "text-ink-2 hover:bg-cream"
+                      }`}
                     >
-                      Sign out
+                      <div className="w-7 h-7 rounded-md bg-gold-pale flex items-center justify-center text-xs font-semibold text-gold shrink-0">
+                        {c.name[0]}
+                      </div>
+                      <span className="truncate font-medium">{c.name}</span>
+                      {selected?.id === c.id && (
+                        <svg className="w-4 h-4 text-gold ml-auto shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                      )}
                     </button>
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
           </div>
-        </div>
 
-        {/* Navigation */}
-        <div className="overflow-auto">
-          <ul className="text-sm font-medium flex-1">
-            {navigation.map((item, idx) => (
-              <li key={idx}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center gap-x-2 p-2 rounded-lg duration-150 ${
-                    pathname?.startsWith(item.href)
-                      ? "bg-gold-pale text-ink"
-                      : "text-ink-2 hover:bg-cream active:bg-gold-pale"
-                  }`}
-                >
-                  <div className={pathname?.startsWith(item.href) ? "text-gold" : "text-ink-3"}>
-                    {item.icon}
-                  </div>
-                  {item.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          <div className="pt-2 mt-2 border-t border-border-subtle">
-            <ul className="text-sm font-medium">
-              {navsFooter.map((item, idx) => (
+          {/* Navigation */}
+          <div className="overflow-auto">
+            <ul className="text-sm font-medium flex-1">
+              {navigation.map((item, idx) => (
                 <li key={idx}>
                   <Link
                     href={item.href}
@@ -245,10 +211,31 @@ const DashboardSidebar = ({ mobileOpen, onMobileClose }: { mobileOpen?: boolean;
                 </li>
               ))}
             </ul>
+
+            <div className="pt-2 mt-2 border-t border-border-subtle">
+              <ul className="text-sm font-medium">
+                {navsFooter.map((item, idx) => (
+                  <li key={idx}>
+                    <Link
+                      href={item.href}
+                      className={`flex items-center gap-x-2 p-2 rounded-lg duration-150 ${
+                        pathname?.startsWith(item.href)
+                          ? "bg-gold-pale text-ink"
+                          : "text-ink-2 hover:bg-cream active:bg-gold-pale"
+                      }`}
+                    >
+                      <div className={pathname?.startsWith(item.href) ? "text-gold" : "text-ink-3"}>
+                        {item.icon}
+                      </div>
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
     </>
   );
 };

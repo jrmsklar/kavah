@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useCommunity } from "@/components/community-context";
 
-type Community = { id: string; name: string; slug: string };
 type Member = {
   id: string;
   user_id: string;
@@ -36,8 +36,7 @@ function formatHeight(inches: number): string {
 }
 
 export default function MembersPage() {
-  const [communities, setCommunities] = useState<Community[]>([]);
-  const [selectedCommunityId, setSelectedCommunityId] = useState<string>("");
+  const { selected: selectedCommunity, loading: communitiesLoading } = useCommunity();
   const router = useRouter();
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,30 +44,17 @@ export default function MembersPage() {
   const [sortKey, setSortKey] = useState<SortKey>("joined");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
-  // Fetch owned communities
+  // Fetch members when selected community changes
   useEffect(() => {
-    fetch("/api/communities/managed")
-      .then((r) => r.json())
-      .then((data) => {
-        setCommunities(data.communities ?? []);
-        if (data.communities?.length > 0) {
-          setSelectedCommunityId(data.communities[0].id);
-        }
-        setLoading(false);
-      });
-  }, []);
-
-  // Fetch members when community changes
-  useEffect(() => {
-    if (!selectedCommunityId) return;
+    if (!selectedCommunity) return;
     setLoading(true);
-    fetch(`/api/members?community_id=${selectedCommunityId}`)
+    fetch(`/api/members?community_id=${selectedCommunity.id}`)
       .then((r) => r.json())
       .then((data) => {
         setMembers(data.members ?? []);
         setLoading(false);
       });
-  }, [selectedCommunityId]);
+  }, [selectedCommunity]);
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -127,17 +113,17 @@ export default function MembersPage() {
     </th>
   );
 
-  if (loading && communities.length === 0) {
+  if (communitiesLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[50vh]">
         <div className="w-6 h-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
       </div>
     );
   }
 
-  if (communities.length === 0) {
+  if (!selectedCommunity) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-8">
+      <div className="flex flex-col items-center justify-center min-h-[50vh] p-8">
         <p className="text-ink-2">
           No communities yet.{" "}
           <a href="/communities/new" className="text-gold font-semibold hover:underline">
@@ -155,21 +141,8 @@ export default function MembersPage() {
 
   return (
     <div className="p-4 sm:p-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6">
         <h1 className="font-serif text-2xl font-medium text-ink">Members</h1>
-
-        {/* Community picker */}
-        <select
-          value={selectedCommunityId}
-          onChange={(e) => setSelectedCommunityId(e.target.value)}
-          className="rounded-lg border border-border bg-warm px-3 py-2 text-sm text-ink focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
-        >
-          {communities.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
       </div>
 
       {/* Summary stats */}
@@ -235,7 +208,7 @@ export default function MembersPage() {
                 {filtered.map((member) => (
                   <tr
                     key={member.id}
-                    onClick={() => router.push(`/members/${member.id}?community_id=${selectedCommunityId}`)}
+                    onClick={() => router.push(`/members/${member.id}?community_id=${selectedCommunity.id}`)}
                     className="hover:bg-cream/50 transition cursor-pointer"
                   >
                     <td className="px-4 py-3 text-ink font-medium">
@@ -286,7 +259,7 @@ export default function MembersPage() {
             {filtered.map((member) => (
               <div
                 key={member.id}
-                onClick={() => router.push(`/members/${member.id}?community_id=${selectedCommunityId}`)}
+                onClick={() => router.push(`/members/${member.id}?community_id=${selectedCommunity.id}`)}
                 className="rounded-xl border border-border bg-warm p-4 cursor-pointer active:bg-cream transition"
               >
                 <div className="flex items-center justify-between">
