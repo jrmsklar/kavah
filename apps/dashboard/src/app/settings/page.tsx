@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
+import { useCommunity } from "@/components/community-context";
 
 type Admin = {
   membershipId: string;
@@ -14,12 +13,9 @@ type Admin = {
   createdAt: string;
 };
 
-export default function CommunitySettingsPage() {
-  const params = useParams();
-  const slug = params.slug as string;
+export default function SettingsPage() {
+  const { selected: selectedCommunity, loading: communitiesLoading } = useCommunity();
 
-  const [communityId, setCommunityId] = useState<string | null>(null);
-  const [communityName, setCommunityName] = useState("");
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,41 +36,32 @@ export default function CommunitySettingsPage() {
     return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
   }
 
-  const fetchData = useCallback(async () => {
-    // First get community ID from slug
-    const commRes = await fetch(`/api/communities/managed`);
-    if (!commRes.ok) return;
-    const { communities } = await commRes.json();
-    const community = communities.find((c: { slug: string }) => c.slug === slug);
-    if (!community) return;
-
-    setCommunityId(community.id);
-    setCommunityName(community.name);
-
-    // Fetch admins
-    const adminsRes = await fetch(`/api/communities/${community.id}/admins`);
-    if (adminsRes.ok) {
-      const { admins } = await adminsRes.json();
+  const fetchAdmins = useCallback(async () => {
+    if (!selectedCommunity) return;
+    const res = await fetch(`/api/communities/${selectedCommunity.id}/admins`);
+    if (res.ok) {
+      const { admins } = await res.json();
       setAdmins(admins);
     }
-
     setLoading(false);
-  }, [slug]);
+  }, [selectedCommunity]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!selectedCommunity) return;
+    setLoading(true);
+    fetchAdmins();
+  }, [selectedCommunity, fetchAdmins]);
 
   async function handleAddAdmin(e: React.FormEvent) {
     e.preventDefault();
-    if (!communityId || phone.length < 10) return;
+    if (!selectedCommunity || phone.length < 10) return;
 
     setError("");
     setSuccess("");
     setIsAdding(true);
 
     try {
-      const res = await fetch(`/api/communities/${communityId}/admins`, {
+      const res = await fetch(`/api/communities/${selectedCommunity.id}/admins`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: `+1${phone}` }),
@@ -95,7 +82,7 @@ export default function CommunitySettingsPage() {
 
       setSuccess(`${data.admin.firstName} ${data.admin.lastName} added as admin.`);
       setPhone("");
-      fetchData();
+      fetchAdmins();
     } catch {
       setError("Something went wrong");
     } finally {
@@ -104,11 +91,11 @@ export default function CommunitySettingsPage() {
   }
 
   async function handleRemoveAdmin(membershipId: string) {
-    if (!communityId) return;
+    if (!selectedCommunity) return;
     setRemovingId(membershipId);
 
     try {
-      const res = await fetch(`/api/communities/${communityId}/admins`, {
+      const res = await fetch(`/api/communities/${selectedCommunity.id}/admins`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ membershipId }),
@@ -122,30 +109,36 @@ export default function CommunitySettingsPage() {
     }
   }
 
-  if (loading) {
+  if (communitiesLoading || loading) {
     return (
-      <div className="p-4 sm:p-8">
+      <div className="flex items-center justify-center min-h-[50vh]">
         <div className="w-6 h-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
       </div>
     );
   }
 
-  return (
-    <div className="p-8">
-      <Link
-        href="/overview"
-        className="text-sm text-ink-3 hover:text-ink-2 transition"
-      >
-        &larr; Back to overview
-      </Link>
+  if (!selectedCommunity) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] p-8">
+        <p className="text-ink-2">
+          No communities yet.{" "}
+          <a href="/communities/new" className="text-gold font-semibold hover:underline">
+            Create one
+          </a>{" "}
+          to get started.
+        </p>
+      </div>
+    );
+  }
 
-      <h1 className="mt-4 font-serif text-2xl font-medium text-ink">Settings</h1>
-      <p className="mt-1 text-sm text-ink-2">
-        Manage admins for {communityName}.
-      </p>
+  return (
+    <div className="p-4 sm:p-8">
+      <div className="mb-6">
+        <h1 className="font-serif text-2xl font-medium text-ink">Settings</h1>
+      </div>
 
       {/* Current admins/owners */}
-      <div className="mt-8 rounded-xl border border-border bg-warm p-6">
+      <div className="rounded-xl border border-border bg-warm p-6">
         <h2 className="font-serif text-lg font-medium text-ink">Team</h2>
         <p className="mt-1 text-sm text-ink-2">
           Owners and admins who can view members and manage this community.

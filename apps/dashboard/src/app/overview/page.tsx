@@ -93,17 +93,9 @@ export default function OverviewPage() {
         {community.description && (
           <p className="mt-1 text-ink-2">{community.description}</p>
         )}
-        <div className="mt-3 flex items-center gap-3">
-          <p className="text-sm text-ink-3">
-            Created {new Date(community.created_at).toLocaleDateString()}
-          </p>
-          <Link
-            href={`/communities/${community.slug}/settings`}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-ink-2 hover:bg-cream transition"
-          >
-            Settings
-          </Link>
-        </div>
+        <p className="mt-3 text-sm text-ink-3">
+          Created {new Date(community.created_at).toLocaleDateString()}
+        </p>
       </div>
 
       {/* Stats */}
