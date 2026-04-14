@@ -105,7 +105,7 @@ export default function NewCommunityPage() {
       }
 
       const { community } = await res.json();
-      router.push(`/communities/${community.slug}`);
+      router.push("/overview");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setIsSubmitting(false);

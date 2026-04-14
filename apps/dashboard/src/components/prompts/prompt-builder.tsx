@@ -248,7 +248,7 @@ export function PromptBuilder({
 
       setDirty(false);
 
-      router.push(`/communities/${slug}`);
+      router.push("/overview");
     } catch {
       toaster.update(toastId, {
         title: "Save failed",
@@ -277,7 +277,7 @@ export function PromptBuilder({
       <div className="flex items-center justify-between mb-8">
         <div>
           <Link
-            href={`/communities/${slug}`}
+            href="/overview"
             className="text-sm text-ink-3 hover:text-ink-2 transition"
           >
             &larr; Back to community

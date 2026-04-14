@@ -133,10 +133,10 @@ export default function CommunitySettingsPage() {
   return (
     <div className="p-8">
       <Link
-        href={`/communities/${slug}`}
+        href="/overview"
         className="text-sm text-ink-3 hover:text-ink-2 transition"
       >
-        &larr; Back to {communityName}
+        &larr; Back to overview
       </Link>
 
       <h1 className="mt-4 font-serif text-2xl font-medium text-ink">Settings</h1>
