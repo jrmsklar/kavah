@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useCommunity } from "@/components/community-context";
 import { PROMPT_TYPE_LABELS } from "@/types/prompts";
@@ -16,6 +16,121 @@ type OverviewData = {
   memberCount: number;
   promptSections: SectionData[];
 };
+
+function LogoEditor({
+  communityId,
+  iconUrl,
+  name,
+  onChange,
+}: {
+  communityId: string;
+  iconUrl: string | null;
+  name: string;
+  onChange: (url: string | null) => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleFile(file: File) {
+    setError(null);
+    if (!file.type.startsWith("image/")) {
+      setError("File must be an image");
+      return;
+    }
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("logo", file);
+    try {
+      const res = await fetch(`/api/communities/${communityId}/logo`, {
+        method: "PATCH",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Upload failed");
+      } else {
+        onChange(data.community.icon_url);
+      }
+    } catch {
+      setError("Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function handleRemove() {
+    if (!confirm("Remove the community logo?")) return;
+    setUploading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("remove", "true");
+      const res = await fetch(`/api/communities/${communityId}/logo`, {
+        method: "PATCH",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Failed to remove");
+      } else {
+        onChange(null);
+      }
+    } catch {
+      setError("Failed to remove");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="mb-4">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) handleFile(f);
+        }}
+      />
+      <div className="flex items-center gap-4">
+        {iconUrl ? (
+          <img src={iconUrl} alt={name} className="h-14 w-14 rounded-lg object-cover border border-border-subtle" />
+        ) : (
+          <div className="h-14 w-14 rounded-lg border border-dashed border-border bg-warm flex items-center justify-center text-ink-3 text-[10px]">
+            No logo
+          </div>
+        )}
+        <div className="flex items-center gap-3 text-xs">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="font-medium text-gold hover:underline disabled:opacity-50 disabled:no-underline"
+          >
+            {uploading ? "Uploading…" : iconUrl ? "Change" : "Upload"}
+          </button>
+          {iconUrl && !uploading && (
+            <>
+              <span className="text-border" aria-hidden>·</span>
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="font-medium text-ink-3 hover:text-ink-2 hover:underline"
+              >
+                Remove
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+      {error && <p className="mt-2 text-xs text-rose">{error}</p>}
+    </div>
+  );
+}
 
 function CopyLinkButton({ link }: { link: string }) {
   const [copied, setCopied] = useState(false);
@@ -82,13 +197,16 @@ export default function OverviewPage() {
   return (
     <div className="p-4 sm:p-8">
       <div>
-        {community.icon_url && (
-          <img
-            src={community.icon_url}
-            alt={community.name}
-            className="h-14 mb-4"
-          />
-        )}
+        <LogoEditor
+          communityId={community.id}
+          iconUrl={community.icon_url}
+          name={community.name}
+          onChange={(newUrl) =>
+            setData((prev) =>
+              prev ? { ...prev, community: { ...prev.community, icon_url: newUrl } } : prev
+            )
+          }
+        />
         <h1 className="font-serif text-3xl font-medium text-ink">{community.name}</h1>
         {community.description && (
           <p className="mt-1 text-ink-2">{community.description}</p>
