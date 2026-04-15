@@ -22,7 +22,8 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (!selectedCommunity) return;
     setLoading(true);
-    fetch(`/api/analytics/memberships?community_id=${selectedCommunity.id}`)
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    fetch(`/api/analytics/memberships?community_id=${selectedCommunity.id}&tz=${encodeURIComponent(tz)}`)
       .then((r) => r.json())
       .then((data) => {
         setDays(data.days ?? []);

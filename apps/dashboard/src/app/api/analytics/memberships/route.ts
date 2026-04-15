@@ -41,6 +41,23 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  // Use the client's timezone for date bucketing (falls back to UTC)
+  const tz = req.nextUrl.searchParams.get("tz") || "UTC";
+
+  // Helper: format a Date to YYYY-MM-DD in the user's timezone
+  function toLocalDateStr(date: Date): string {
+    return date.toLocaleDateString("en-CA", { timeZone: tz }); // en-CA gives YYYY-MM-DD
+  }
+
+  function toLabel(date: Date): string {
+    return date.toLocaleDateString("en-US", {
+      timeZone: tz,
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  }
+
   // Get memberships created in the last 7 days
   const now = new Date();
   const sevenDaysAgo = new Date(now);
@@ -59,13 +76,11 @@ export async function GET(req: NextRequest) {
   for (let i = 6; i >= 0; i--) {
     const d = new Date(now);
     d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split("T")[0];
-    const label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-    days.push({ date: dateStr, label, count: 0 });
+    days.push({ date: toLocalDateStr(d), label: toLabel(d), count: 0 });
   }
 
   for (const m of memberships ?? []) {
-    const dateStr = new Date(m.created_at).toISOString().split("T")[0];
+    const dateStr = toLocalDateStr(new Date(m.created_at));
     const day = days.find((d) => d.date === dateStr);
     if (day) day.count++;
   }
